@@ -76,7 +76,7 @@ async function run() {
       licenseNumber: licenseNo,
       category: 'Class A',
       licenseExpiryDate: '2030-01-01',
-      contact: '555-1111',
+      contact: '9999999999',
       safetyScore: 95,
       status: 'Available'
     })
@@ -92,7 +92,8 @@ async function run() {
     body: JSON.stringify({
       vehicleId: vehicle.id,
       driverId: driver.id,
-      routeName: 'Workflow Test Route',
+      startLocation: 'Chennai',
+      endLocation: 'Bangalore',
       cargoWeight: 800
     })
   });
@@ -120,7 +121,7 @@ async function run() {
     headers: getHeaders(),
     body: JSON.stringify({
       finalOdometer: 1150,
-      fuelUsed: 12.5,
+      fuelConsumed: 12.5,
       remarks: 'Completed route safely.'
     })
   });

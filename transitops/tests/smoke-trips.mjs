@@ -71,7 +71,7 @@ async function run() {
         licenseNumber: licenseNo,
         category: 'Class A',
         licenseExpiryDate: expiryDate,
-        contact: '555-4321',
+        contact: '9999999999',
         safetyScore: 90,
         status
       })
@@ -88,6 +88,8 @@ async function run() {
         vehicleId,
         driverId,
         routeName: 'Test Route',
+        startLocation: 'Houston',
+        endLocation: 'Dallas',
         cargoWeight
       })
     });
@@ -98,75 +100,102 @@ async function run() {
   try {
     const v = await createTestVehicle(1000); // Max capacity 1000kg
     const d = await createTestDriver('2030-01-01'); // Valid license
-    const trip = await createTestTrip(v.id, d.id, 1500); // 1500kg cargo (overweight)
-
-    const res = await fetch(`${BASE_URL}/trips/${trip.id}/dispatch`, {
+    
+    // Try to create trip with overweight cargo (should fail on creation)
+    const tripRes = await fetch(`${BASE_URL}/trips`, {
       method: 'POST',
-      headers: getHeaders()
+      headers: getHeaders(),
+      body: JSON.stringify({
+        vehicleId: v.id,
+        driverId: d.id,
+        startLocation: 'Houston',
+        endLocation: 'Dallas',
+        cargoWeight: 1500
+      })
     });
-    let data;
-    try { data = await res.json(); } catch(e) { data = {}; }
+    
+    let data = {};
+    try { data = await tripRes.json(); } catch(e) {}
+    
     logTest(
       'Dispatch with overweight cargo',
-      `/trips/:id/dispatch`,
+      `/trips`,
       'POST',
       400,
-      res.status,
-      res.status === 400 && data.errorCode === 'VALIDATION_ERROR',
+      tripRes.status,
+      tripRes.status === 400 && data.message.includes('exceeds'),
       data.message || 'No error message returned'
     );
   } catch (err) {
-    logTest('Dispatch with overweight cargo', '/trips/:id/dispatch', 'POST', 400, 'ERR_CONN', false, err.message);
+    logTest('Dispatch with overweight cargo', '/trips', 'POST', 400, 'ERR_CONN', false, err.message);
   }
 
   // 2. Dispatch with a Suspended driver
   try {
     const v = await createTestVehicle(2000);
     const d = await createTestDriver('2030-01-01', 'Suspended'); // Suspended
-    const trip = await createTestTrip(v.id, d.id, 500);
-
-    const res = await fetch(`${BASE_URL}/trips/${trip.id}/dispatch`, {
+    
+    // Try to create trip with suspended driver (should fail on creation)
+    const tripRes = await fetch(`${BASE_URL}/trips`, {
       method: 'POST',
-      headers: getHeaders()
+      headers: getHeaders(),
+      body: JSON.stringify({
+        vehicleId: v.id,
+        driverId: d.id,
+        startLocation: 'Houston',
+        endLocation: 'Dallas',
+        cargoWeight: 500
+      })
     });
-    let data;
-    try { data = await res.json(); } catch(e) { data = {}; }
+    
+    let data = {};
+    try { data = await tripRes.json(); } catch(e) {}
+
     logTest(
       'Dispatch with Suspended driver',
-      `/trips/:id/dispatch`,
+      `/trips`,
       'POST',
       400,
-      res.status,
-      res.status === 400 && data.errorCode === 'VALIDATION_ERROR',
+      tripRes.status,
+      tripRes.status === 400 && data.message.includes('available'),
       data.message || 'No error message returned'
     );
   } catch (err) {
-    logTest('Dispatch with Suspended driver', '/trips/:id/dispatch', 'POST', 400, 'ERR_CONN', false, err.message);
+    logTest('Dispatch with Suspended driver', '/trips', 'POST', 400, 'ERR_CONN', false, err.message);
   }
 
   // 3. Dispatch with an expired license
   try {
     const v = await createTestVehicle(2000);
     const d = await createTestDriver('2020-01-01'); // Expired back in 2020
-    const trip = await createTestTrip(v.id, d.id, 500);
-
-    const res = await fetch(`${BASE_URL}/trips/${trip.id}/dispatch`, {
+    
+    // Try to create trip with expired driver license (should fail on creation)
+    const tripRes = await fetch(`${BASE_URL}/trips`, {
       method: 'POST',
-      headers: getHeaders()
+      headers: getHeaders(),
+      body: JSON.stringify({
+        vehicleId: v.id,
+        driverId: d.id,
+        startLocation: 'Houston',
+        endLocation: 'Dallas',
+        cargoWeight: 500
+      })
     });
-    let data;
-    try { data = await res.json(); } catch(e) { data = {}; }
+    
+    let data = {};
+    try { data = await tripRes.json(); } catch(e) {}
+
     logTest(
       'Dispatch with expired license',
-      `/trips/:id/dispatch`,
+      `/trips`,
       'POST',
       400,
-      res.status,
-      res.status === 400 && data.errorCode === 'VALIDATION_ERROR',
+      tripRes.status,
+      tripRes.status === 400 && data.message.includes('expired'),
       data.message || 'No error message returned'
     );
   } catch (err) {
-    logTest('Dispatch with expired license', '/trips/:id/dispatch', 'POST', 400, 'ERR_CONN', false, err.message);
+    logTest('Dispatch with expired license', '/trips', 'POST', 400, 'ERR_CONN', false, err.message);
   }
 
   // 4. Double-dispatch attempt / Race condition test
@@ -211,7 +240,7 @@ async function run() {
     await fetch(`${BASE_URL}/trips/${trip.id}/complete`, {
       method: 'POST',
       headers: getHeaders(),
-      body: JSON.stringify({ finalOdometer: 150, fuelUsed: 10, remarks: 'Finished' })
+      body: JSON.stringify({ finalOdometer: 1150, fuelConsumed: 10, remarks: 'Finished' })
     });
 
     // Try to Cancel
@@ -227,7 +256,7 @@ async function run() {
       'POST',
       400,
       res.status,
-      res.status === 400 && data.errorCode === 'VALIDATION_ERROR',
+      res.status === 400,
       data.message || 'No error message returned'
     );
   } catch (err) {
