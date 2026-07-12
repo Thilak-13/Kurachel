@@ -1,5 +1,38 @@
 [
-  { "id": "t1", "routeName": "Route 42 - Downtown Express", "vehicleId": "v1", "vehiclePlate": "TX-1234", "driverId": "d2", "driverName": "John Smith", "status": "IN_PROGRESS", "startTime": "08:00 AM", "destination": "Downtown Hub" },
-  { "id": "t2", "routeName": "Route 10 - Airport Shuttle", "vehicleId": "v3", "vehiclePlate": "TX-8888", "driverId": "d1", "driverName": "Jane Doe", "status": "SCHEDULED", "startTime": "11:30 AM", "destination": "Terminal 2" },
-  { "id": "t3", "routeName": "Route 5 - Northside Delivery", "vehicleId": "v5", "vehiclePlate": "TX-4321", "driverId": "d3", "driverName": "Alice Johnson", "status": "COMPLETED", "startTime": "06:00 AM", "destination": "North Logistics Park" }
+  {
+    "id": "t1",
+    "source": "Houston Hub",
+    "destination": "Austin Depot",
+    "vehicleId": "v1",
+    "driverId": "d1",
+    "cargoWeight": 2500,
+    "plannedDistance": 162,
+    "expectedStartDate": "2026-07-15",
+    "notes": "Fragile electronic goods",
+    "status": "Draft"
+  },
+  {
+    "id": "t2",
+    "source": "Dallas Terminal",
+    "destination": "Fort Worth Facility",
+    "vehicleId": "v3",
+    "driverId": "d2",
+    "cargoWeight": 3800,
+    "plannedDistance": 32,
+    "expectedStartDate": "2026-07-14",
+    "notes": "Urgent medical supplies",
+    "status": "Dispatched"
+  },
+  {
+    "id": "t3",
+    "source": "San Antonio Logistics",
+    "destination": "El Paso Center",
+    "vehicleId": "v2",
+    "driverId": "d4",
+    "cargoWeight": 1200,
+    "plannedDistance": 550,
+    "expectedStartDate": "2026-07-10",
+    "notes": "Routine dry goods shipment",
+    "status": "Completed"
+  }
 ]

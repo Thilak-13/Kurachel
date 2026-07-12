@@ -8,6 +8,8 @@ import Trips from './pages/Trips';
 import Maintenance from './pages/Maintenance';
 import Reports from './pages/Reports';
 import Login from './pages/Login';
+import FuelLogs from './pages/FuelLogs';
+import Expenses from './pages/Expenses';
 
 function ProtectedRoute({ isAuthenticated, user, allowedRoles, children }) {
   if (!isAuthenticated) {
@@ -119,6 +121,34 @@ function App() {
             >
               <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
                 <Maintenance user={user} />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/fuel"
+          element={
+            <ProtectedRoute 
+              isAuthenticated={isAuthenticated} 
+              user={user} 
+              allowedRoles={['Admin', 'Fleet Manager', 'Dispatcher', 'Maintenance Manager']}
+            >
+              <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
+                <FuelLogs user={user} />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/expenses"
+          element={
+            <ProtectedRoute 
+              isAuthenticated={isAuthenticated} 
+              user={user} 
+              allowedRoles={['Admin', 'Fleet Manager', 'Dispatcher']}
+            >
+              <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
+                <Expenses user={user} />
               </MainLayout>
             </ProtectedRoute>
           }

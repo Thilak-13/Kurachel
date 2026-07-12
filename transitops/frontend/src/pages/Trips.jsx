@@ -1,156 +1,407 @@
 import React, { useState, useEffect } from 'react';
-import { getTrips } from '../services/tripApi';
-import { Route, Plus, Search, Calendar, MapPin } from 'lucide-react';
+import { 
+  getTrips, 
+  createTrip, 
+  updateTrip, 
+  deleteTrip, 
+  dispatchTrip, 
+  completeTrip, 
+  cancelTrip, 
+  getAvailableVehicles, 
+  getAvailableDrivers 
+} from '../services/tripApi';
+import { getVehicles } from '../services/vehicleApi';
+import { getDrivers } from '../services/driverApi';
+
+import TripTable from '../components/TripTable';
+import TripForm from '../components/TripForm';
+import CompleteTripModal from '../components/CompleteTripModal';
+import CancelTripModal from '../components/CancelTripModal';
+import ViewTripModal from '../components/ViewTripModal';
+
+import SearchBar from '../components/SearchBar';
+import FilterDropdown from '../components/FilterDropdown';
+import ConfirmDialog from '../components/ConfirmDialog';
+import Toast from '../components/Toast';
+
+import { Plus, Route, AlertCircle, RefreshCw } from 'lucide-react';
 
 export default function Trips({ user }) {
   const [trips, setTrips] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
+  const [drivers, setDrivers] = useState([]);
+  const [availableVehicles, setAvailableVehicles] = useState([]);
+  const [availableDrivers, setAvailableDrivers] = useState([]);
+  
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // Filtering states
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
 
-  useEffect(() => {
-    async function loadTrips() {
-      try {
-        const data = await getTrips();
-        setTrips(data);
-      } catch (err) {
-        console.error('Error loading trips:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadTrips();
-  }, []);
+  // Modal / Selection states
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingTrip, setEditingTrip] = useState(null);
+  const [viewingTrip, setViewingTrip] = useState(null);
+  
+  const [completingTripId, setCompletingTripId] = useState(null);
+  const [cancellingTripId, setCancellingTripId] = useState(null);
+  const [dispatchingTripId, setDispatchingTripId] = useState(null);
+  const [deletingTripId, setDeletingTripId] = useState(null);
 
-  const filteredTrips = trips.filter(t => {
-    const matchesSearch = t.routeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.driverName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.vehiclePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.destination.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'ALL' || t.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  // Confirm dialogue triggers
+  const [isDispatchConfirmOpen, setIsDispatchConfirmOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'IN_PROGRESS':
-        return <span className="px-2.5 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-800">In Progress</span>;
-      case 'SCHEDULED':
-        return <span className="px-2.5 py-1 text-xs font-bold rounded-full bg-indigo-100 text-indigo-800">Scheduled</span>;
-      case 'COMPLETED':
-        return <span className="px-2.5 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800">Completed</span>;
-      case 'CANCELLED':
-        return <span className="px-2.5 py-1 text-xs font-bold rounded-full bg-rose-100 text-rose-800">Cancelled</span>;
-      default:
-        return <span className="px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-800">{status}</span>;
+  // Toast
+  const [toast, setToast] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+  };
+
+  const loadData = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const [tList, vList, dList, avList, adList] = await Promise.all([
+        getTrips(),
+        getVehicles(),
+        getDrivers(),
+        getAvailableVehicles(),
+        getAvailableDrivers()
+      ]);
+      setTrips(tList);
+      setVehicles(vList);
+      setDrivers(dList);
+      setAvailableVehicles(avList);
+      setAvailableDrivers(adList);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to fetch transit records. Please try again.');
+      showToast('Error loading dispatch board data', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleCreateOrUpdate = async (formData) => {
+    setSubmitting(true);
+    try {
+      if (editingTrip) {
+        await updateTrip(editingTrip.id, formData);
+        showToast('Trip modified successfully.');
+      } else {
+        await createTrip(formData);
+        showToast('Trip scheduled successfully.');
+      }
+      setIsFormOpen(false);
+      setEditingTrip(null);
+      await loadData();
+    } catch (err) {
+      console.error(err);
+      showToast(editingTrip ? 'Failed to modify trip' : 'Failed to create trip', 'error');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Dispatch lifecycle
+  const handleDispatchTrigger = (id) => {
+    setDispatchingTripId(id);
+    setIsDispatchConfirmOpen(true);
+  };
+
+  const handleDispatchConfirm = async () => {
+    setIsDispatchConfirmOpen(false);
+    if (!dispatchingTripId) return;
+    setLoading(true);
+    try {
+      await dispatchTrip(dispatchingTripId);
+      showToast('Trip successfully dispatched!');
+      await loadData();
+    } catch (err) {
+      console.error(err);
+      showToast('Dispatch failed. Please check driver/vehicle status.', 'error');
+    } finally {
+      setDispatchingTripId(null);
+      setLoading(false);
+    }
+  };
+
+  // Completion lifecycle
+  const handleCompleteTrigger = (id) => {
+    setCompletingTripId(id);
+  };
+
+  const handleCompleteSubmit = async (completionData) => {
+    const id = completingTripId;
+    setCompletingTripId(null);
+    if (!id) return;
+    setLoading(true);
+    try {
+      await completeTrip(id, completionData);
+      showToast('Trip completed successfully!');
+      await loadData();
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to record trip completion details.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cancellation lifecycle
+  const handleCancelTrigger = (id) => {
+    setCancellingTripId(id);
+  };
+
+  const handleCancelSubmit = async (reason) => {
+    const id = cancellingTripId;
+    setCancellingTripId(null);
+    if (!id) return;
+    setLoading(true);
+    try {
+      await cancelTrip(id, reason);
+      showToast('Trip cancelled successfully.');
+      await loadData();
+    } catch (err) {
+      console.error(err);
+      showToast('Cancellation request failed.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Deletion lifecycle
+  const handleDeleteTrigger = (id) => {
+    setDeletingTripId(id);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    setIsDeleteConfirmOpen(false);
+    const id = deletingTripId;
+    setDeletingTripId(null);
+    if (!id) return;
+    setLoading(true);
+    try {
+      await deleteTrip(id);
+      showToast('Trip deleted successfully.');
+      await loadData();
+    } catch (err) {
+      console.error(err);
+      showToast('Deletion failed.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openAddModal = () => {
+    setEditingTrip(null);
+    setIsFormOpen(true);
+  };
+
+  const openEditModal = (trip) => {
+    setEditingTrip(trip);
+    setIsFormOpen(true);
+  };
+
+  const openViewModal = (trip) => {
+    setViewingTrip(trip);
+  };
+
+  // Filtering list matches
+  const filteredTrips = trips.filter((t) => {
+    const matchedVehicle = vehicles.find((v) => v.id === t.vehicleId);
+    const matchedDriver = drivers.find((d) => d.id === t.driverId);
+
+    const vehiclePlate = matchedVehicle ? matchedVehicle.registrationNumber : '';
+    const driverName = matchedDriver ? matchedDriver.name : '';
+
+    const matchesSearch = 
+      t.source?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.destination?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vehiclePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      driverName.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus = statusFilter === 'ALL' || t.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const statusOptions = [
+    { value: 'ALL', label: 'All Statuses' },
+    { value: 'Draft', label: 'Draft' },
+    { value: 'Dispatched', label: 'Dispatched' },
+    { value: 'Completed', label: 'Completed' },
+    { value: 'Cancelled', label: 'Cancelled' }
+  ];
+
+  const activeCompletingTrip = trips.find(t => t.id === completingTripId);
+  const activeCompletingVehicle = activeCompletingTrip ? vehicles.find(v => v.id === activeCompletingTrip.vehicleId) : null;
+
+  const activeViewingTrip = viewingTrip;
+  const activeViewingVehicle = activeViewingTrip ? vehicles.find(v => v.id === activeViewingTrip.vehicleId) : null;
+  const activeViewingDriver = activeViewingTrip ? drivers.find(d => d.id === activeViewingTrip.driverId) : null;
+
+  const isDispatcher = user?.role === 'Admin' || user?.role === 'Dispatcher';
+
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900">Trip Dispatch Control Board</h2>
+          <h2 className="text-2xl font-bold text-slate-900">Trip Dispatch Control Board</h2>
           <p className="text-sm text-slate-500 mt-0.5">Schedule routes, dispatch vehicles, and track ongoing trip completions</p>
         </div>
-        {(user?.role === 'Admin' || user?.role === 'Dispatcher') && (
-          <button className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded-xl transition-all shadow-md shadow-blue-500/20 active:scale-95 self-start sm:self-auto">
+        {isDispatcher && (
+          <button
+            onClick={openAddModal}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded-xl transition-all shadow-md shadow-blue-500/25 active:scale-95 self-start sm:self-auto"
+          >
             <Plus className="w-4 h-4" />
-            <span>Dispatch Trip</span>
+            <span>Create Trip</span>
           </button>
         )}
       </div>
 
       {/* Control bar */}
       <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
-        <div className="relative w-full md:w-80">
-          <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 pointer-events-none">
-            <Search className="w-4 h-4" />
-          </span>
-          <input
-            type="text"
-            placeholder="Search route name, driver, vehicle plate, destination..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder-slate-400"
-          />
-        </div>
+        <SearchBar 
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Search source, destination, vehicle, driver..."
+        />
 
-        <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-          {['ALL', 'SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'].map((status) => (
-            <button
-              key={status}
-              onClick={() => setStatusFilter(status)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
-                statusFilter === status
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              {status === 'ALL' ? 'All Statuses' : status.replace('_', ' ')}
-            </button>
-          ))}
+        <div className="flex flex-wrap gap-4 items-center w-full md:w-auto">
+          <FilterDropdown 
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={statusOptions}
+            label="Status"
+          />
+          <button 
+            onClick={loadData}
+            title="Reload Trips"
+            className="p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-700 rounded-xl border border-slate-200 transition-colors ml-auto md:ml-0"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
         </div>
       </div>
 
-      {/* Table */}
+      {/* Table Container */}
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-slate-500 font-semibold animate-pulse">Loading dispatch board...</div>
-        ) : filteredTrips.length === 0 ? (
-          <div className="p-12 text-center text-slate-500 font-medium">No trips found matching the filters.</div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 tracking-wider">
-                  <th className="py-4 px-6">ID</th>
-                  <th className="py-4 px-6">Route & Destination</th>
-                  <th className="py-4 px-6">Vehicle</th>
-                  <th className="py-4 px-6">Driver</th>
-                  <th className="py-4 px-6">Scheduled Time</th>
-                  <th className="py-4 px-6">Status</th>
-                  {(user?.role === 'Admin' || user?.role === 'Dispatcher') && <th className="py-4 px-6 text-right">Actions</th>}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-sm">
-                {filteredTrips.map((trip) => (
-                  <tr key={trip.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="py-4 px-6 font-semibold text-slate-500">{trip.id}</td>
-                    <td className="py-4 px-6">
-                      <div>
-                        <div className="font-bold text-slate-900">{trip.routeName}</div>
-                        <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
-                          <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                          <span>{trip.destination}</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="font-semibold text-slate-700">{trip.vehiclePlate}</div>
-                    </td>
-                    <td className="py-4 px-6 font-semibold text-slate-700">{trip.driverName}</td>
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-1.5 text-slate-600">
-                        <Calendar className="w-4 h-4 text-slate-400" />
-                        <span className="font-medium">{trip.startTime}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">{getStatusBadge(trip.status)}</td>
-                    {(user?.role === 'Admin' || user?.role === 'Dispatcher') && (
-                      <td className="py-4 px-6 text-right whitespace-nowrap">
-                        <button className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors mr-3">Manage</button>
-                        <button className="text-xs font-bold text-red-600 hover:text-red-800 transition-colors">Cancel</button>
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="flex flex-col items-center justify-center py-20 gap-3">
+            <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+            <span className="text-sm font-bold text-slate-500">Loading dispatch records...</span>
           </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center text-red-500 gap-3">
+            <AlertCircle className="w-12 h-12 text-red-400" />
+            <div>
+              <p className="font-bold text-lg">{error}</p>
+              <button 
+                onClick={loadData} 
+                className="mt-2 text-sm font-bold text-blue-600 hover:underline"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        ) : filteredTrips.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-slate-400 gap-3">
+            <Route className="w-16 h-16 text-slate-300" />
+            <div className="text-center">
+              <p className="font-bold text-lg text-slate-600">No Trips Scheduled</p>
+              <p className="text-sm mt-0.5">Try adjusting search query filters or schedule a new trip record.</p>
+            </div>
+          </div>
+        ) : (
+          <TripTable 
+            trips={filteredTrips}
+            vehicles={vehicles}
+            drivers={drivers}
+            onDispatch={handleDispatchTrigger}
+            onEdit={openEditModal}
+            onDelete={handleDeleteTrigger}
+            onComplete={handleCompleteTrigger}
+            onCancel={handleCancelTrigger}
+            onView={openViewModal}
+          />
         )}
       </div>
+
+      {/* Modals & Popups */}
+      <TripForm 
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={handleCreateOrUpdate}
+        trip={editingTrip}
+        availableVehicles={availableVehicles}
+        availableDrivers={availableDrivers}
+        vehicles={vehicles}
+        drivers={drivers}
+      />
+
+      <CompleteTripModal 
+        isOpen={completingTripId !== null}
+        onClose={() => setCompletingTripId(null)}
+        onSubmit={handleCompleteSubmit}
+        trip={activeCompletingTrip}
+        vehicle={activeCompletingVehicle}
+      />
+
+      <CancelTripModal 
+        isOpen={cancellingTripId !== null}
+        onClose={() => setCancellingTripId(null)}
+        onConfirm={handleCancelSubmit}
+      />
+
+      <ViewTripModal 
+        isOpen={viewingTrip !== null}
+        onClose={() => setViewingTrip(null)}
+        trip={activeViewingTrip}
+        vehicle={activeViewingVehicle}
+        driver={activeViewingDriver}
+      />
+
+      {/* Confirm dialogues */}
+      <ConfirmDialog 
+        isOpen={isDispatchConfirmOpen}
+        onClose={() => setIsDispatchConfirmOpen(false)}
+        onConfirm={handleDispatchConfirm}
+        title="Confirm Dispatch"
+        message="Are you sure you want to dispatch this trip? This will mark the trip status as 'Dispatched' and allocate the assigned vehicle and driver resources."
+        confirmText="Dispatch"
+        cancelText="Cancel"
+      />
+
+      <ConfirmDialog 
+        isOpen={isDeleteConfirmOpen}
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Trip"
+        message="Are you sure you want to delete this trip schedule? This will permanently remove the record from the database."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
+
+      {toast && (
+        <Toast 
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

@@ -12,7 +12,9 @@ import {
   LogOut,
   User,
   Shield,
-  Menu
+  Menu,
+  Fuel,
+  DollarSign
 } from 'lucide-react';
 
 const navigationItems = [
@@ -21,6 +23,8 @@ const navigationItems = [
   { name: 'Drivers', path: '/drivers', icon: Users, roles: ['Admin', 'Fleet Manager', 'Dispatcher'] },
   { name: 'Trips', path: '/trips', icon: Route, roles: ['Admin', 'Dispatcher'] },
   { name: 'Maintenance', path: '/maintenance', icon: Wrench, roles: ['Admin', 'Dispatcher', 'Maintenance Manager'] },
+  { name: 'Fuel Logs', path: '/fuel', icon: Fuel, roles: ['Admin', 'Fleet Manager', 'Dispatcher', 'Maintenance Manager'] },
+  { name: 'Expenses', path: '/expenses', icon: DollarSign, roles: ['Admin', 'Fleet Manager', 'Dispatcher'] },
   { name: 'Reports', path: '/reports', icon: FileText, roles: ['Admin', 'Fleet Manager', 'Maintenance Manager'] },
 ];
 
