@@ -39,6 +39,7 @@ async function main() {
   const adminUser = await prisma.user.create({
     data: {
       email: 'admin@transitops.com',
+      username: 'admin_arthur',
       password: adminPassword,
       name: 'Arthur Miller',
       roleId: adminRole.id,
@@ -48,6 +49,7 @@ async function main() {
   const dispatcherUser = await prisma.user.create({
     data: {
       email: 'dispatcher@transitops.com',
+      username: 'dispatcher_debbie',
       password: dispatcherPassword,
       name: 'Debbie Dispatcher',
       roleId: dispatcherRole.id,
@@ -57,6 +59,7 @@ async function main() {
   const driverUser = await prisma.user.create({
     data: {
       email: 'john.doe@transitops.com',
+      username: 'driver_john',
       password: driverPassword,
       name: 'John Doe',
       roleId: driverRole.id,
@@ -66,6 +69,7 @@ async function main() {
   const maintenanceUser = await prisma.user.create({
     data: {
       email: 'mechanic.bill@transitops.com',
+      username: 'mechanic_bill',
       password: maintenancePassword,
       name: 'Bill Mechanic',
       roleId: maintenanceRole.id,

@@ -11,6 +11,7 @@ import driverRoutes from './routes/driver.routes.js';
 import tripRoutes from './routes/trip.routes.js';
 import maintenanceRoutes from './routes/maintenance.routes.js';
 import reportRoutes from './routes/report.routes.js';
+import authRoutes from './routes/auth.routes.js';
 
 // Load environment variables
 dotenv.config();
@@ -50,6 +51,7 @@ app.get('/health', (req, res) => {
 });
 
 // Register Domain Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/drivers', driverRoutes);
 app.use('/api/trips', tripRoutes);
