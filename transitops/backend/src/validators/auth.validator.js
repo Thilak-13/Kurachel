@@ -47,8 +47,8 @@ export const registerValidator = [
     .optional()
     .trim()
     .toUpperCase()
-    .isIn(['ADMIN', 'DISPATCHER', 'DRIVER', 'MAINTENANCE_STAFF'])
-    .withMessage('Role must be one of: ADMIN, DISPATCHER, DRIVER, MAINTENANCE_STAFF'),
+    .isIn(['ADMIN', 'FLEET_MANAGER', 'DISPATCHER', 'DRIVER', 'MAINTENANCE_MANAGER'])
+    .withMessage('Role must be one of: ADMIN, FLEET_MANAGER, DISPATCHER, DRIVER, MAINTENANCE_MANAGER'),
 
   handleValidationErrors
 ];

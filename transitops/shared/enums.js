@@ -24,8 +24,10 @@ const TripStatus = Object.freeze({
 
 const Roles = Object.freeze({
   ADMIN: 'Admin',
+  FLEET_MANAGER: 'Fleet Manager',
   DISPATCHER: 'Dispatcher',
   DRIVER: 'Driver',
+  MAINTENANCE_MANAGER: 'Maintenance Manager',
 });
 
 module.exports = Object.freeze({

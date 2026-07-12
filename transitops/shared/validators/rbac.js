@@ -3,16 +3,16 @@ const { Roles } = require('../enums');
 
 const PERMISSIONS = Object.freeze({
   // Vehicle actions
-  'vehicle:create': [Roles.ADMIN],
-  'vehicle:update': [Roles.ADMIN, Roles.DISPATCHER],
-  'vehicle:delete': [Roles.ADMIN],
-  'vehicle:view': [Roles.ADMIN, Roles.DISPATCHER, Roles.DRIVER],
+  'vehicle:create': [Roles.ADMIN, Roles.FLEET_MANAGER],
+  'vehicle:update': [Roles.ADMIN, Roles.FLEET_MANAGER, Roles.DISPATCHER],
+  'vehicle:delete': [Roles.ADMIN, Roles.FLEET_MANAGER],
+  'vehicle:view': [Roles.ADMIN, Roles.FLEET_MANAGER, Roles.DISPATCHER, Roles.DRIVER],
 
   // Driver actions
-  'driver:create': [Roles.ADMIN],
-  'driver:update': [Roles.ADMIN],
-  'driver:delete': [Roles.ADMIN],
-  'driver:view': [Roles.ADMIN, Roles.DISPATCHER],
+  'driver:create': [Roles.ADMIN, Roles.FLEET_MANAGER],
+  'driver:update': [Roles.ADMIN, Roles.FLEET_MANAGER],
+  'driver:delete': [Roles.ADMIN, Roles.FLEET_MANAGER],
+  'driver:view': [Roles.ADMIN, Roles.FLEET_MANAGER, Roles.DISPATCHER],
 
   // Trip actions
   'trip:create': [Roles.ADMIN, Roles.DISPATCHER],
@@ -23,21 +23,21 @@ const PERMISSIONS = Object.freeze({
   'trip:view': [Roles.ADMIN, Roles.DISPATCHER, Roles.DRIVER],
 
   // Maintenance actions
-  'maintenance:create': [Roles.ADMIN, Roles.DISPATCHER],
-  'maintenance:update': [Roles.ADMIN, Roles.DISPATCHER],
-  'maintenance:view': [Roles.ADMIN, Roles.DISPATCHER],
+  'maintenance:create': [Roles.ADMIN, Roles.DISPATCHER, Roles.MAINTENANCE_MANAGER],
+  'maintenance:update': [Roles.ADMIN, Roles.DISPATCHER, Roles.MAINTENANCE_MANAGER],
+  'maintenance:view': [Roles.ADMIN, Roles.DISPATCHER, Roles.MAINTENANCE_MANAGER],
 
   // Fuel log actions
-  'fuel-log:create': [Roles.ADMIN, Roles.DISPATCHER, Roles.DRIVER],
-  'fuel-log:view': [Roles.ADMIN, Roles.DISPATCHER],
+  'fuel-log:create': [Roles.ADMIN, Roles.FLEET_MANAGER, Roles.DISPATCHER, Roles.DRIVER, Roles.MAINTENANCE_MANAGER],
+  'fuel-log:view': [Roles.ADMIN, Roles.FLEET_MANAGER, Roles.DISPATCHER, Roles.MAINTENANCE_MANAGER],
 
   // Expense actions
-  'expense:create': [Roles.ADMIN, Roles.DISPATCHER, Roles.DRIVER],
-  'expense:view': [Roles.ADMIN, Roles.DISPATCHER],
+  'expense:create': [Roles.ADMIN, Roles.FLEET_MANAGER, Roles.DISPATCHER, Roles.DRIVER],
+  'expense:view': [Roles.ADMIN, Roles.FLEET_MANAGER, Roles.DISPATCHER],
 
   // Reports / Dashboard actions
-  'report:view': [Roles.ADMIN, Roles.DISPATCHER],
-  'dashboard:view': [Roles.ADMIN, Roles.DISPATCHER],
+  'report:view': [Roles.ADMIN, Roles.FLEET_MANAGER, Roles.MAINTENANCE_MANAGER],
+  'dashboard:view': [Roles.ADMIN, Roles.FLEET_MANAGER, Roles.DISPATCHER, Roles.MAINTENANCE_MANAGER],
 });
 
 /**

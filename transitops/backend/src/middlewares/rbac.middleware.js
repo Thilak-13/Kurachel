@@ -13,9 +13,10 @@ export const requirePermission = (action) => {
     // Dev 2's auth guard attaches decoded user payload with role to req.user
     const roleMap = {
       'ADMIN': 'Admin',
+      'FLEET_MANAGER': 'Fleet Manager',
       'DISPATCHER': 'Dispatcher',
       'DRIVER': 'Driver',
-      'MAINTENANCE_STAFF': 'Maintenance Staff'
+      'MAINTENANCE_MANAGER': 'Maintenance Manager'
     };
     const role = roleMap[req.user?.role] || req.user?.role;
 

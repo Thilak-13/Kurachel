@@ -15,9 +15,10 @@ datasource db {
 
 enum UserRole {
   ADMIN
+  FLEET_MANAGER
   DISPATCHER
   DRIVER
-  MAINTENANCE_STAFF
+  MAINTENANCE_MANAGER
 }
 
 enum VehicleStatus {
