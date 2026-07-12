@@ -1,169 +1,395 @@
-import React, { useState, useEffect } from 'react';
-import { getDashboardStats } from '../services/reportApi';
-import { 
+import React, { useState, useEffect, useCallback } from 'react';
+import { getDashboard } from '../services/reportApi';
+import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend 
+  PieChart, Pie, Cell, Legend
 } from 'recharts';
-import { Truck, Navigation, Users, Activity, Clock, Wrench, Percent } from 'lucide-react';
+import {
+  Truck, Navigation, Users, Activity, Clock, Wrench, TrendingUp,
+  AlertCircle, RefreshCw, Filter
+} from 'lucide-react';
 
-const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#ef4444'];
+const PALETTE = {
+  blue:   '#3b82f6',
+  emerald:'#10b981',
+  amber:  '#f59e0b',
+  rose:   '#ef4444',
+  violet: '#8b5cf6',
+  cyan:   '#06b6d4',
+  slate:  '#64748b',
+  indigo: '#6366f1',
+};
 
-export default function Dashboard({ user }) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+const PIE_COLORS  = [PALETTE.blue, PALETTE.emerald, PALETTE.amber, PALETTE.rose];
+const PIE_COLORS2 = [PALETTE.cyan, PALETTE.emerald, PALETTE.rose, PALETTE.slate];
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const stats = await getDashboardStats();
-        setData(stats);
-      } catch (error) {
-        console.error('Error loading dashboard stats:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
-  }, []);
+const VEHICLE_TYPES  = ['All Types', 'Box Truck', 'Flatbed', 'Van', 'Tanker', 'Refrigerated'];
+const VEHICLE_STATUSES = ['All Statuses', 'Available', 'On Trip', 'In Shop', 'Retired'];
+const REGIONS = ['All Regions', 'North', 'South', 'East', 'West', 'Central'];
 
-  if (loading) {
-    return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-8 bg-slate-200 rounded-lg w-1/4"></div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-32 bg-slate-200 rounded-xl"></div>
-          ))}
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="h-80 bg-slate-200 rounded-xl"></div>
-          <div className="h-80 bg-slate-200 rounded-xl"></div>
+// ─── Tooltip ──────────────────────────────────
+const DarkTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-slate-900 text-white rounded-xl px-4 py-2.5 shadow-xl text-xs">
+      {label && <p className="font-bold mb-1">{label}</p>}
+      {payload.map((p, i) => (
+        <p key={i} style={{ color: p.color || '#fff' }}>
+          {p.name}: <span className="font-extrabold">{p.value}</span>
+        </p>
+      ))}
+    </div>
+  );
+};
+
+// ─── Skeleton Card ─────────────────────────────
+const SkeletonCard = () => (
+  <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm animate-pulse h-32" />
+);
+
+const SkeletonChart = () => (
+  <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm animate-pulse h-80" />
+);
+
+// ─── KPI Card ─────────────────────────────────
+function KpiCard({ name, value, icon: Icon, bgColor, iconColor, trend, trendUp }) {
+  return (
+    <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm
+      hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider leading-tight">{name}</span>
+        <div className={`p-2.5 rounded-xl ${bgColor}`}>
+          <Icon className={`w-5 h-5 ${iconColor}`} />
         </div>
       </div>
-    );
-  }
+      <div className="mt-4 flex items-end justify-between gap-2">
+        <span className="text-3xl font-extrabold text-slate-900 tracking-tight tabular-nums">{value}</span>
+        {trend && (
+          <span className={`text-xs font-semibold pb-0.5 ${trendUp ? 'text-emerald-500' : 'text-slate-400'}`}>
+            {trend}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
-  if (!data) return <div className="text-red-500 font-semibold">Error loading dashboard metrics.</div>;
+// ─── Chart Card ───────────────────────────────
+function ChartCard({ title, subtitle, children }) {
+  return (
+    <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col">
+      <div className="mb-4">
+        <h3 className="text-base font-bold text-slate-900">{title}</h3>
+        {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
+      </div>
+      {children}
+    </div>
+  );
+}
 
-  const kpis = [
-    { name: 'Active Vehicles', value: data.activeVehicles, icon: Truck, color: 'bg-blue-500 text-blue-500', trend: 'In service' },
-    { name: 'Available Vehicles', value: data.availableVehicles, icon: Activity, color: 'bg-emerald-500 text-emerald-500', trend: 'Ready' },
-    { name: 'Vehicles in Maintenance', value: data.vehiclesInMaintenance, icon: Wrench, color: 'bg-amber-500 text-amber-500', trend: 'Scheduled/Active' },
-    { name: 'Active Trips', value: data.activeTrips, icon: Navigation, color: 'bg-indigo-500 text-indigo-500', trend: 'On road' },
-    { name: 'Pending Trips', value: data.pendingTrips, icon: Clock, color: 'bg-slate-500 text-slate-500', trend: 'In queue' },
-    { name: 'Drivers on Duty', value: data.driversOnDuty, icon: Users, color: 'bg-cyan-500 text-cyan-500', trend: 'Logged in' },
-    { name: 'Fleet Utilization', value: `${data.fleetUtilization}%`, icon: Percent, color: 'bg-purple-500 text-purple-500', trend: 'Target: 85%' },
-  ];
+export default function Dashboard({ user }) {
+  const [data, setData]       = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState('');
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const [filters, setFilters] = useState({
+    vehicleType: 'All Types',
+    vehicleStatus: 'All Statuses',
+    region: 'All Regions',
+  });
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const stats = await getDashboard(filters);
+      setData(stats);
+    } catch (err) {
+      console.error('Dashboard load error:', err);
+      setError('Failed to load dashboard metrics. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  // ── KPI definitions ──────────────────────────
+  const kpis = data ? [
+    { name: 'Active Vehicles',       value: data.activeVehicles,        icon: Truck,       bgColor: 'bg-blue-50',   iconColor: 'text-blue-600',   trend: 'On road' },
+    { name: 'Available Vehicles',    value: data.availableVehicles,     icon: Activity,    bgColor: 'bg-emerald-50',iconColor: 'text-emerald-600',trend: 'Ready for dispatch', trendUp: true },
+    { name: 'In Maintenance',        value: data.vehiclesInMaintenance, icon: Wrench,      bgColor: 'bg-amber-50',  iconColor: 'text-amber-600',  trend: 'Scheduled' },
+    { name: 'Active Trips',          value: data.activeTrips,           icon: Navigation,  bgColor: 'bg-indigo-50', iconColor: 'text-indigo-600', trend: 'In transit' },
+    { name: 'Pending Trips',         value: data.pendingTrips,          icon: Clock,       bgColor: 'bg-slate-50',  iconColor: 'text-slate-600',  trend: 'Draft / queued' },
+    { name: 'Drivers on Duty',       value: data.driversOnDuty,         icon: Users,       bgColor: 'bg-cyan-50',   iconColor: 'text-cyan-600',   trend: 'Active shifts', trendUp: true },
+    { name: 'Fleet Utilization',     value: `${data.fleetUtilization}%`,icon: TrendingUp,  bgColor: 'bg-violet-50', iconColor: 'text-violet-600', trend: 'Target: 85%', trendUp: data.fleetUtilization >= 85 },
+  ] : [];
 
   return (
     <div className="space-y-6">
-      {/* Welcome Card */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* ── Header ───────────────────────────── */}
+      <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm
+        flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Welcome back, {user?.username}!</h2>
+          <h2 className="text-2xl font-bold text-slate-900">
+            Welcome back, {user?.username || 'Operator'}!
+          </h2>
           <p className="text-sm text-slate-500 mt-1">
-            Logged in as <span className="font-semibold text-blue-600">{user?.role}</span>. Here is the operational summary of your fleet.
+            Logged in as <span className="font-semibold text-blue-600">{user?.role}</span>
+            {' '}· Fleet operational summary as of{' '}
+            <span className="font-semibold">{new Date().toLocaleDateString(undefined, { dateStyle: 'long' })}</span>
           </p>
         </div>
-        <div className="text-sm text-slate-555 font-medium bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 self-start md:self-auto">
-          System Time: {new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        <div className="flex items-center gap-3 flex-wrap">
+          <button
+            onClick={() => setFiltersOpen(f => !f)}
+            className={`inline-flex items-center gap-2 px-3.5 py-2 text-sm font-bold rounded-xl border transition-all
+              ${filtersOpen
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}
+          >
+            <Filter className="w-4 h-4" />
+            <span>Filters</span>
+          </button>
+          <button
+            onClick={loadData}
+            disabled={loading}
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-bold rounded-xl
+              border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-all
+              disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <span>Refresh</span>
+          </button>
         </div>
       </div>
 
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {kpis.map((kpi, index) => {
-          const Icon = kpi.icon;
-          return (
-            <div 
-              key={kpi.name}
-              className={`bg-white rounded-2xl p-5 border border-slate-200/85 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 flex flex-col justify-between ${
-                kpis.length % 4 !== 0 && index === kpis.length - 1 ? 'sm:col-span-2 lg:col-span-4' : ''
-              }`}
+      {/* ── Filter Bar ───────────────────────── */}
+      {filtersOpen && (
+        <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm
+          flex flex-wrap gap-4 items-end">
+          <div>
+            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+              Vehicle Type
+            </label>
+            <select
+              value={filters.vehicleType}
+              onChange={e => handleFilterChange('vehicleType', e.target.value)}
+              className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl
+                focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
             >
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-slate-500">{kpi.name}</span>
-                <div className={`p-2.5 rounded-xl bg-opacity-10 ${kpi.color}`}>
-                  <Icon className="w-5 h-5 font-bold" />
-                </div>
-              </div>
-              <div className="mt-4 flex items-baseline justify-between">
-                <span className="text-3xl font-extrabold text-slate-900 tracking-tight">{kpi.value}</span>
-                <span className="text-xs font-semibold text-slate-400">{kpi.trend}</span>
-              </div>
-            </div>
-          );
-        })}
+              {VEHICLE_TYPES.map(t => <option key={t}>{t}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+              Vehicle Status
+            </label>
+            <select
+              value={filters.vehicleStatus}
+              onChange={e => handleFilterChange('vehicleStatus', e.target.value)}
+              className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl
+                focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              {VEHICLE_STATUSES.map(s => <option key={s}>{s}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+              Region
+            </label>
+            <select
+              value={filters.region}
+              onChange={e => handleFilterChange('region', e.target.value)}
+              className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl
+                focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              {REGIONS.map(r => <option key={r}>{r}</option>)}
+            </select>
+          </div>
+          <button
+            onClick={() => setFilters({ vehicleType: 'All Types', vehicleStatus: 'All Statuses', region: 'All Regions' })}
+            className="px-3 py-2 text-sm font-bold text-slate-600 hover:text-slate-900 border
+              border-slate-200 bg-white rounded-xl hover:bg-slate-50 transition-all"
+          >
+            Reset
+          </button>
+        </div>
+      )}
+
+      {/* ── Error ────────────────────────────── */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+          <p className="text-sm font-bold text-red-700 flex-1">{error}</p>
+          <button
+            onClick={loadData}
+            className="text-sm font-bold text-red-600 hover:underline"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {/* ── KPI Cards ────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {loading
+          ? [...Array(7)].map((_, i) => <SkeletonCard key={i} />)
+          : kpis.map(kpi => (
+            <KpiCard key={kpi.name} {...kpi} />
+          ))
+        }
       </div>
 
-      {/* Charts Grid */}
+      {/* ── Charts Row 1: Bar Charts ─────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Weekly Trip Volume (Bar Chart) */}
-        <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col">
-          <div className="mb-4">
-            <h3 className="text-lg font-bold text-slate-900">Weekly Trip Volume</h3>
-            <p className="text-xs text-slate-500">Number of successfully dispatched trips by day</p>
-          </div>
-          <div className="h-80 w-full flex-1">
+        {/* Fleet Utilization by Type */}
+        {loading ? <SkeletonChart /> : (
+          <ChartCard
+            title="Fleet Utilization by Vehicle Type"
+            subtitle="Percentage of time vehicles are actively deployed per category"
+          >
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data?.fleetUtilizationByType || []} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="type" tickLine={false} axisLine={false}
+                    tick={{ fill: '#64748b', fontSize: 11 }} />
+                  <YAxis domain={[0, 100]} tickLine={false} axisLine={false}
+                    tick={{ fill: '#64748b', fontSize: 11 }} unit="%" />
+                  <Tooltip content={<DarkTooltip />} cursor={{ fill: '#f8fafc' }} />
+                  <Bar dataKey="utilization" name="Utilization %" fill={PALETTE.violet}
+                    radius={[6, 6, 0, 0]} maxBarSize={48} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </ChartCard>
+        )}
+
+        {/* Weekly Trip Volume */}
+        {loading ? <SkeletonChart /> : (
+          <ChartCard
+            title="Weekly Trip Volume"
+            subtitle="Dispatched vs completed trips for the current week"
+          >
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data?.weeklyTrips || []} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="day" tickLine={false} axisLine={false}
+                    tick={{ fill: '#64748b', fontSize: 11 }} />
+                  <YAxis tickLine={false} axisLine={false}
+                    tick={{ fill: '#64748b', fontSize: 11 }} />
+                  <Tooltip content={<DarkTooltip />} cursor={{ fill: '#f8fafc' }} />
+                  <Bar dataKey="trips" name="Dispatched" fill={PALETTE.blue}
+                    radius={[6, 6, 0, 0]} maxBarSize={22} />
+                  <Bar dataKey="completed" name="Completed" fill={PALETTE.emerald}
+                    radius={[6, 6, 0, 0]} maxBarSize={22} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </ChartCard>
+        )}
+      </div>
+
+      {/* ── Charts Row 2: Pie Charts ─────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Vehicle Status Pie */}
+        {loading ? <SkeletonChart /> : (
+          <ChartCard
+            title="Vehicle Status Distribution"
+            subtitle="Current allocation breakdown across all fleet vehicles"
+          >
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={data?.vehicleStatusDistribution || []}
+                    cx="50%" cy="45%"
+                    innerRadius={65} outerRadius={95}
+                    paddingAngle={4} dataKey="value"
+                  >
+                    {(data?.vehicleStatusDistribution || []).map((_, i) => (
+                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<DarkTooltip />} />
+                  <Legend verticalAlign="bottom" height={36} iconType="circle"
+                    formatter={v => <span className="text-xs font-semibold text-slate-600">{v}</span>}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </ChartCard>
+        )}
+
+        {/* Driver Status Pie */}
+        {loading ? <SkeletonChart /> : (
+          <ChartCard
+            title="Driver Status Distribution"
+            subtitle="Active, available, and suspended driver headcount breakdown"
+          >
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={data?.driverStatusDistribution || []}
+                    cx="50%" cy="45%"
+                    innerRadius={65} outerRadius={95}
+                    paddingAngle={4} dataKey="value"
+                  >
+                    {(data?.driverStatusDistribution || []).map((_, i) => (
+                      <Cell key={i} fill={PIE_COLORS2[i % PIE_COLORS2.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<DarkTooltip />} />
+                  <Legend verticalAlign="bottom" height={36} iconType="circle"
+                    formatter={v => <span className="text-xs font-semibold text-slate-600">{v}</span>}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </ChartCard>
+        )}
+      </div>
+
+      {/* ── Trip Status Bar Chart ─────────────── */}
+      {loading ? <SkeletonChart /> : (
+        <ChartCard
+          title="Trip Status Breakdown"
+          subtitle="Current distribution of all trip records across status states"
+        >
+          <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.weeklyTrips} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="day" tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-                <YAxis tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-                <Tooltip 
-                  cursor={{ fill: '#f8fafc' }}
-                  contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: 'none', color: '#fff' }}
-                  labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
-                />
-                <Bar 
-                  dataKey="trips" 
-                  fill="#3b82f6" 
-                  radius={[8, 8, 0, 0]} 
-                  maxBarSize={45}
-                />
+              <BarChart
+                data={data?.tripStatusDistribution || []}
+                layout="vertical"
+                margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                <XAxis type="number" tickLine={false} axisLine={false}
+                  tick={{ fill: '#64748b', fontSize: 11 }} />
+                <YAxis type="category" dataKey="name" tickLine={false} axisLine={false}
+                  tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} width={90} />
+                <Tooltip content={<DarkTooltip />} cursor={{ fill: '#f8fafc' }} />
+                <Bar dataKey="value" name="Trips" radius={[0, 6, 6, 0]} maxBarSize={32}>
+                  {(data?.tripStatusDistribution || []).map((entry, i) => {
+                    const colors = [PALETTE.blue, PALETTE.slate, PALETTE.emerald, PALETTE.rose];
+                    return <Cell key={i} fill={colors[i % colors.length]} />;
+                  })}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
-
-        {/* Vehicle Status Distribution (Pie Chart) */}
-        <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col">
-          <div className="mb-4">
-            <h3 className="text-lg font-bold text-slate-900">Vehicle Status Distribution</h3>
-            <p className="text-xs text-slate-500">Allocation and availability breakdown of fleet vehicles</p>
-          </div>
-          <div className="h-80 w-full flex-1 flex flex-col justify-center items-center">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={data.vehicleStatusDistribution}
-                  cx="50%"
-                  cy="45%"
-                  innerRadius={70}
-                  outerRadius={100}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {data.vehicleStatusDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderRadius: '12px', border: 'none', color: '#fff' }}
-                />
-                <Legend 
-                  verticalAlign="bottom" 
-                  height={36}
-                  iconType="circle"
-                  formatter={(value, entry) => (
-                    <span className="text-xs font-semibold text-slate-600">{value}</span>
-                  )}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
+        </ChartCard>
+      )}
     </div>
   );
 }

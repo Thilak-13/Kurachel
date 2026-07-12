@@ -1,9 +1,158 @@
+/* ────────────────────────────────────────────
+   Google Font — Inter (must be first)
+──────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-slate-50 text-slate-900 antialiased;
+    min-height: 100vh;
   }
+
+  /* ── Global scrollbar ─────────────────── */
+  ::-webkit-scrollbar          { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track    { background: transparent; }
+  ::-webkit-scrollbar-thumb    { @apply bg-slate-300 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-slate-400; }
+
+  /* ── Selection ────────────────────────── */
+  ::selection { @apply bg-blue-100 text-blue-900; }
+
+  /* ── Focus ring ───────────────────────── */
+  :focus-visible {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2 rounded-md;
+  }
+}
+
+@layer components {
+  /* ── Buttons ──────────────────────────── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5
+      bg-blue-600 hover:bg-blue-700 active:scale-95
+      text-white text-sm font-bold rounded-xl
+      transition-all duration-200 shadow-sm
+      disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5
+      bg-white hover:bg-slate-50 active:scale-95
+      text-slate-700 text-sm font-bold rounded-xl
+      border border-slate-200 transition-all duration-200
+      disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5
+      bg-red-600 hover:bg-red-700 active:scale-95
+      text-white text-sm font-bold rounded-xl
+      transition-all duration-200 shadow-sm
+      disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-2
+      text-slate-500 hover:text-slate-800 hover:bg-slate-100 active:scale-95
+      text-sm font-semibold rounded-xl transition-all duration-200;
+  }
+
+  /* ── Form inputs ──────────────────────── */
+  .form-input {
+    @apply w-full px-3.5 py-2.5 text-sm bg-white border border-slate-200 rounded-xl
+      placeholder:text-slate-400
+      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+      transition-all duration-200;
+  }
+
+  .form-label {
+    @apply block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5;
+  }
+
+  /* ── Cards ────────────────────────────── */
+  .card {
+    @apply bg-white rounded-2xl border border-slate-200/80 shadow-sm;
+  }
+
+  .card-hover {
+    @apply card hover:shadow-md hover:-translate-y-0.5 transition-all duration-200;
+  }
+
+  /* ── Badge / chip ─────────────────────── */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold;
+  }
+
+  /* ── Table ────────────────────────────── */
+  .data-table {
+    @apply w-full text-left border-collapse;
+  }
+
+  .data-table thead th {
+    @apply py-3.5 px-5 text-xs font-bold text-slate-500 uppercase tracking-wider
+      bg-slate-50 border-b border-slate-200;
+  }
+
+  .data-table tbody tr {
+    @apply border-b border-slate-100 hover:bg-slate-50/60 transition-colors;
+  }
+
+  .data-table tbody td {
+    @apply py-3.5 px-5 text-sm text-slate-700;
+  }
+
+  /* ── Page header ──────────────────────── */
+  .page-header {
+    @apply flex flex-col sm:flex-row sm:items-center justify-between gap-4;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold text-slate-900;
+  }
+
+  .page-subtitle {
+    @apply text-sm text-slate-500 mt-0.5;
+  }
+
+  /* ── Empty state ──────────────────────── */
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-20 text-center gap-3;
+  }
+
+  /* ── Loading skeleton pulse ───────────── */
+  .skeleton {
+    @apply bg-slate-200 rounded-lg animate-pulse;
+  }
+
+  /* ── Modal overlay ────────────────────── */
+  .modal-overlay {
+    @apply fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4;
+  }
+
+  .modal-box {
+    @apply bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto;
+  }
+}
+
+@layer utilities {
+  /* Tabular numbers for consistent numeric columns */
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+
+  /* Hide scrollbar visually but keep functionality */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }

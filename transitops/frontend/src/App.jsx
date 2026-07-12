@@ -1,15 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './components/MainLayout';
-import Dashboard from './pages/Dashboard';
-import Vehicles from './pages/Vehicles';
-import Drivers from './pages/Drivers';
-import Trips from './pages/Trips';
-import Maintenance from './pages/Maintenance';
-import Reports from './pages/Reports';
-import Login from './pages/Login';
-import FuelLogs from './pages/FuelLogs';
-import Expenses from './pages/Expenses';
+
+// ── Lazy-loaded pages ─────────────────────────────
+const Dashboard   = lazy(() => import('./pages/Dashboard'));
+const Vehicles    = lazy(() => import('./pages/Vehicles'));
+const Drivers     = lazy(() => import('./pages/Drivers'));
+const Trips       = lazy(() => import('./pages/Trips'));
+const Maintenance = lazy(() => import('./pages/Maintenance'));
+const Reports     = lazy(() => import('./pages/Reports'));
+const Login       = lazy(() => import('./pages/Login'));
+const FuelLogs    = lazy(() => import('./pages/FuelLogs'));
+const Expenses    = lazy(() => import('./pages/Expenses'));
+
+// ── Page loading fallback ─────────────────────────
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center h-full min-h-[60vh]">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+        <p className="text-sm font-semibold text-slate-400">Loading...</p>
+      </div>
+    </div>
+  );
+}
 
 function ProtectedRoute({ isAuthenticated, user, allowedRoles, children }) {
   if (!isAuthenticated) {
@@ -47,129 +61,46 @@ function App() {
     }
   }, [isAuthenticated, user]);
 
+  // Shared layout wrapper
+  const withLayout = (Component, allowedRoles) => (
+    <ProtectedRoute isAuthenticated={isAuthenticated} user={user} allowedRoles={allowedRoles}>
+      <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
+        <Suspense fallback={<PageLoader />}>
+          <Component user={user} />
+        </Suspense>
+      </MainLayout>
+    </ProtectedRoute>
+  );
+
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Route */}
-        <Route 
-          path="/login" 
+        {/* Public */}
+        <Route
+          path="/login"
           element={
             isAuthenticated ? (
               <Navigate to="/dashboard" replace />
             ) : (
-              <Login setUser={setUser} setIsAuthenticated={setIsAuthenticated} />
+              <Suspense fallback={<PageLoader />}>
+                <Login setUser={setUser} setIsAuthenticated={setIsAuthenticated} />
+              </Suspense>
             )
-          } 
-        />
-
-        {/* Protected Routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute isAuthenticated={isAuthenticated} user={user}>
-              <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
-                <Dashboard user={user} />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/vehicles"
-          element={
-            <ProtectedRoute isAuthenticated={isAuthenticated} user={user}>
-              <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
-                <Vehicles user={user} />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/drivers"
-          element={
-            <ProtectedRoute 
-              isAuthenticated={isAuthenticated} 
-              user={user} 
-              allowedRoles={['Admin', 'Fleet Manager', 'Dispatcher']}
-            >
-              <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
-                <Drivers user={user} />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/trips"
-          element={
-            <ProtectedRoute 
-              isAuthenticated={isAuthenticated} 
-              user={user} 
-              allowedRoles={['Admin', 'Dispatcher']}
-            >
-              <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
-                <Trips user={user} />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/maintenance"
-          element={
-            <ProtectedRoute 
-              isAuthenticated={isAuthenticated} 
-              user={user} 
-              allowedRoles={['Admin', 'Dispatcher', 'Maintenance Manager']}
-            >
-              <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
-                <Maintenance user={user} />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/fuel"
-          element={
-            <ProtectedRoute 
-              isAuthenticated={isAuthenticated} 
-              user={user} 
-              allowedRoles={['Admin', 'Fleet Manager', 'Dispatcher', 'Maintenance Manager']}
-            >
-              <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
-                <FuelLogs user={user} />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/expenses"
-          element={
-            <ProtectedRoute 
-              isAuthenticated={isAuthenticated} 
-              user={user} 
-              allowedRoles={['Admin', 'Fleet Manager', 'Dispatcher']}
-            >
-              <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
-                <Expenses user={user} />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/reports"
-          element={
-            <ProtectedRoute 
-              isAuthenticated={isAuthenticated} 
-              user={user} 
-              allowedRoles={['Admin', 'Fleet Manager', 'Maintenance Manager']}
-            >
-              <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
-                <Reports user={user} />
-              </MainLayout>
-            </ProtectedRoute>
           }
         />
 
-        {/* Catch-all Route redirects to Login or Dashboard */}
-        <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
+        {/* Protected */}
+        <Route path="/dashboard"   element={withLayout(Dashboard)} />
+        <Route path="/vehicles"    element={withLayout(Vehicles)} />
+        <Route path="/drivers"     element={withLayout(Drivers,     ['Admin', 'Fleet Manager', 'Dispatcher'])} />
+        <Route path="/trips"       element={withLayout(Trips,       ['Admin', 'Dispatcher'])} />
+        <Route path="/maintenance" element={withLayout(Maintenance, ['Admin', 'Dispatcher', 'Maintenance Manager'])} />
+        <Route path="/fuel"        element={withLayout(FuelLogs,    ['Admin', 'Fleet Manager', 'Dispatcher', 'Maintenance Manager'])} />
+        <Route path="/expenses"    element={withLayout(Expenses,    ['Admin', 'Fleet Manager', 'Dispatcher'])} />
+        <Route path="/reports"     element={withLayout(Reports,     ['Admin', 'Fleet Manager', 'Maintenance Manager'])} />
+
+        {/* Catch-all */}
+        <Route path="*" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} />
       </Routes>
     </BrowserRouter>
   );
