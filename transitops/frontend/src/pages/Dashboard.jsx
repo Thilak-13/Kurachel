@@ -52,7 +52,7 @@ const SkeletonChart = () => (
 );
 
 // ─── KPI Card ─────────────────────────────────
-function KpiCard({ name, value, icon: Icon, bgColor, iconColor, trend, trendUp }) {
+function KpiCard({ name, value, icon: Icon, bgColor, iconColor, trend, trendUp, subtitle }) {
   return (
     <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm
       hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between">
@@ -70,6 +70,7 @@ function KpiCard({ name, value, icon: Icon, bgColor, iconColor, trend, trendUp }
           </span>
         )}
       </div>
+      {subtitle && <p className="mt-2 text-xs text-slate-500">{subtitle}</p>}
     </div>
   );
 }
@@ -123,7 +124,7 @@ export default function Dashboard({ user }) {
 
   // ── KPI definitions ──────────────────────────
   const kpis = data ? [
-    { name: 'Active Vehicles',       value: data.activeVehicles,        icon: Truck,       bgColor: 'bg-blue-50',   iconColor: 'text-blue-600',   trend: 'On road' },
+    { name: 'Active Vehicles',       value: data.activeVehicles,        icon: Truck,       bgColor: 'bg-blue-50',   iconColor: 'text-blue-600',   trend: 'On road', subtitle: 'Total operational fleet (excludes retired vehicles)' },
     { name: 'Available Vehicles',    value: data.availableVehicles,     icon: Activity,    bgColor: 'bg-emerald-50',iconColor: 'text-emerald-600',trend: 'Ready for dispatch', trendUp: true },
     { name: 'In Maintenance',        value: data.vehiclesInMaintenance, icon: Wrench,      bgColor: 'bg-amber-50',  iconColor: 'text-amber-600',  trend: 'Scheduled' },
     { name: 'Active Trips',          value: data.activeTrips,           icon: Navigation,  bgColor: 'bg-indigo-50', iconColor: 'text-indigo-600', trend: 'In transit' },

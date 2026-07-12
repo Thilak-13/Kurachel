@@ -3,6 +3,8 @@ import { X } from 'lucide-react';
 
 const LICENSE_CATEGORIES = ['Class A', 'Class B', 'Class C', 'Class D', 'Class M'];
 const DRIVER_STATUSES = ['Available', 'On Trip', 'Suspended', 'Inactive'];
+const LICENSE_NUMBER_PATTERN = /^[A-Z]{2}\d{2}\s?\d{11}$/;
+const INDIAN_PHONE_PATTERN = /^\+91-?\d{10}$/;
 
 export default function DriverForm({ isOpen, onClose, onSubmit, driver }) {
   const [formData, setFormData] = useState({
@@ -60,6 +62,8 @@ export default function DriverForm({ isOpen, onClose, onSubmit, driver }) {
 
     if (!formData.licenseNumber.trim()) {
       newErrors.licenseNumber = 'License Number is required';
+    } else if (!LICENSE_NUMBER_PATTERN.test(formData.licenseNumber.trim())) {
+      newErrors.licenseNumber = 'Format: DL14 20180098765';
     }
 
     if (!formData.licenseCategory) {
@@ -72,6 +76,8 @@ export default function DriverForm({ isOpen, onClose, onSubmit, driver }) {
 
     if (!formData.phoneNumber.trim()) {
       newErrors.phoneNumber = 'Phone Number is required';
+    } else if (!INDIAN_PHONE_PATTERN.test(formData.phoneNumber.trim())) {
+      newErrors.phoneNumber = 'Format: +91-9876543210';
     }
 
     // Safety Score
@@ -154,7 +160,7 @@ export default function DriverForm({ isOpen, onClose, onSubmit, driver }) {
                   name="licenseNumber"
                   value={formData.licenseNumber}
                   onChange={handleChange}
-                  placeholder="e.g. DL-123456"
+                  placeholder="e.g. DL14 20180098765"
                   className={`w-full px-3.5 py-2.5 text-sm bg-slate-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                     errors.licenseNumber ? 'border-red-300 focus:ring-red-500' : 'border-slate-200'
                   }`}
@@ -209,7 +215,7 @@ export default function DriverForm({ isOpen, onClose, onSubmit, driver }) {
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleChange}
-                  placeholder="e.g. 555-0199"
+                  placeholder="e.g. +91-9876543210"
                   className={`w-full px-3.5 py-2.5 text-sm bg-slate-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                     errors.phoneNumber ? 'border-red-300 focus:ring-red-500' : 'border-slate-200'
                   }`}

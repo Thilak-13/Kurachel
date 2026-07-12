@@ -16,7 +16,7 @@ export const driverValidator = [
     .if((value, { req }) => req.method === 'POST')
     .trim()
     .notEmpty().withMessage('License number is required')
-    .isLength({ min: 5, max: 25 }).withMessage('License number must be between 5 and 25 characters'),
+    .matches(/^[A-Z]{2}\d{2}\s?\d{11}$/).withMessage('License number must use the format DL14 20180098765'),
 
   body('licenseExpiryDate')
     .if((value, { req }) => req.method === 'POST')
@@ -27,7 +27,7 @@ export const driverValidator = [
   body('contact')
     .optional({ checkFalsy: true })
     .trim()
-    .isLength({ min: 10, max: 15 }).withMessage('Contact/phone number must be between 10 and 15 digits'),
+    .matches(/^\+91-?\d{10}$/).withMessage('Contact/phone number must use the format +91-9876543210'),
 
   body('category')
     .optional({ checkFalsy: true })

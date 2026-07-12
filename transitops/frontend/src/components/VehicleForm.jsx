@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 
 const VEHICLE_TYPES = ['Van', 'Box Truck', 'Flatbed', 'Sedan', 'Trailer'];
 const VEHICLE_STATUSES = ['Available', 'On Trip', 'In Shop', 'Retired'];
+const REGISTRATION_NUMBER_PATTERN = /^[A-Z]{2}-\d{1,2}[A-Z]{0,2}-[A-Z]{1,2}-\d{4}$/;
 
 export default function VehicleForm({ isOpen, onClose, onSubmit, vehicle }) {
   const [formData, setFormData] = useState({
@@ -56,6 +57,8 @@ export default function VehicleForm({ isOpen, onClose, onSubmit, vehicle }) {
 
     if (!formData.registrationNumber.trim()) {
       newErrors.registrationNumber = 'Registration Number is required';
+    } else if (!REGISTRATION_NUMBER_PATTERN.test(formData.registrationNumber.trim())) {
+      newErrors.registrationNumber = 'Format: MH-12-AB-3456 or DL-3C-AB-1234';
     }
 
     if (!formData.model.trim()) {
@@ -150,7 +153,7 @@ export default function VehicleForm({ isOpen, onClose, onSubmit, vehicle }) {
                 name="registrationNumber"
                 value={formData.registrationNumber}
                 onChange={handleChange}
-                placeholder="e.g. TN 01 AB 1234"
+                placeholder="e.g. MH-12-AB-3456"
                 className={`w-full px-3.5 py-2.5 text-sm bg-slate-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                   errors.registrationNumber ? 'border-red-300 focus:ring-red-500' : 'border-slate-200'
                 }`}

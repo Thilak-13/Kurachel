@@ -1,7 +1,7 @@
 [
   {
     "id": "v1",
-    "registrationNumber": "TN 01 AB 1234",
+    "registrationNumber": "MH-12-PQ-4567",
     "model": "Tata Ultra 1412",
     "type": "Box Truck",
     "maxLoadCapacity": 7000,
@@ -11,7 +11,7 @@
   },
   {
     "id": "v2",
-    "registrationNumber": "MH 12 CD 5678",
+    "registrationNumber": "DL-3C-AB-1234",
     "model": "Ashok Leyland Dost+",
     "type": "Van",
     "maxLoadCapacity": 1480,
@@ -21,7 +21,7 @@
   },
   {
     "id": "v3",
-    "registrationNumber": "KA 05 EF 9012",
+    "registrationNumber": "KA-51-MB-9988",
     "model": "Eicher Pro 2095",
     "type": "Flatbed",
     "maxLoadCapacity": 9200,
@@ -31,12 +31,22 @@
   },
   {
     "id": "v4",
-    "registrationNumber": "DL 08 GH 3456",
+    "registrationNumber": "HR-26-DJ-5678",
     "model": "Mahindra Furio 7",
     "type": "Van",
     "maxLoadCapacity": 3500,
     "odometer": 125000,
     "acquisitionCost": 1450000,
     "status": "Retired"
+  },
+  {
+    "id": "v5",
+    "registrationNumber": "TS-09-UB-3456",
+    "model": "Eicher Pro 2049",
+    "type": "Box Truck",
+    "maxLoadCapacity": 3500,
+    "odometer": 21100,
+    "acquisitionCost": 1400000,
+    "status": "Available"
   }
 ]
