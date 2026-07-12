@@ -127,7 +127,7 @@ export default function Drivers({ user }) {
     { value: 'Available', label: 'Available' },
     { value: 'On Trip', label: 'On Trip' },
     { value: 'Suspended', label: 'Suspended' },
-    { value: 'Inactive', label: 'Inactive' }
+    { value: 'Off Duty', label: 'Off Duty' }
   ];
 
   const canEdit = user?.role === 'Admin';

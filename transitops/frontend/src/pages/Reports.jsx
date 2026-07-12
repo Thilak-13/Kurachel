@@ -91,7 +91,7 @@ export default function Reports({ user }) {
     if (!data?.vehicleReports?.length) return;
     setExporting(true);
     try {
-      await exportReportCSV(data.vehicleReports);
+      await exportReportCSV();
     } catch (err) {
       console.error('CSV export error:', err);
     } finally {

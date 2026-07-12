@@ -9,7 +9,14 @@ function getStoredDrivers() {
     return driversMock;
   }
   try {
-    return JSON.parse(stored);
+    const drivers = JSON.parse(stored);
+    const normalizedDrivers = drivers.map((driver) => (
+      driver.status === 'Inactive' ? { ...driver, status: 'Off Duty' } : driver
+    ));
+    if (normalizedDrivers.some((driver, index) => driver !== drivers[index])) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizedDrivers));
+    }
+    return normalizedDrivers;
   } catch (e) {
     console.error('Error parsing stored drivers, resetting storage', e);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(driversMock));

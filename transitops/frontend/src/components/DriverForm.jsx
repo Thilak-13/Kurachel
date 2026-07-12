@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 const LICENSE_CATEGORIES = ['Class A', 'Class B', 'Class C', 'Class D', 'Class M'];
-const DRIVER_STATUSES = ['Available', 'On Trip', 'Suspended', 'Inactive'];
+const DRIVER_STATUSES = ['Available', 'On Trip', 'Suspended', 'Off Duty'];
 const LICENSE_NUMBER_PATTERN = /^[A-Z]{2}\d{2}\s?\d{11}$/;
 const INDIAN_PHONE_PATTERN = /^\+91-?\d{10}$/;
 

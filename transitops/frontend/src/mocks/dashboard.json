@@ -31,7 +31,7 @@
     { "name": "On Trip", "value": 22 },
     { "name": "Available", "value": 18 },
     { "name": "Suspended", "value": 2 },
-    { "name": "Inactive", "value": 4 }
+    { "name": "Off Duty", "value": 4 }
   ],
   "fleetUtilizationByType": [
     { "type": "Box Truck", "utilization": 88 },

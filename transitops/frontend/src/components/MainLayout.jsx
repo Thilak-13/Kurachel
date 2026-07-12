@@ -72,7 +72,7 @@ export default function MainLayout({ children, user, setUser, setIsAuthenticated
           {!isCollapsed && (
             <div className="flex items-center gap-2 font-bold text-lg text-blue-400 tracking-wider">
               <Shield className="w-6 h-6 text-blue-500" />
-              <span>TRANSIT<span className="text-white">OPS</span></span>
+              <span>KURA<span className="text-white">CHEL</span></span>
             </div>
           )}
           {isCollapsed && (
@@ -152,7 +152,7 @@ export default function MainLayout({ children, user, setUser, setIsAuthenticated
         <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800 bg-slate-950">
           <div className="flex items-center gap-2 font-bold text-lg text-blue-400 tracking-wider">
             <Shield className="w-6 h-6 text-blue-500" />
-            <span>TRANSIT<span className="text-white">OPS</span></span>
+            <span>KURA<span className="text-white">CHEL</span></span>
           </div>
           <button 
             onClick={() => setIsMobileMenuOpen(false)}

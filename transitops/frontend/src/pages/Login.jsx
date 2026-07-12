@@ -39,7 +39,7 @@ export default function Login({ setUser, setIsAuthenticated }) {
             <Shield className="w-7 h-7 text-white" />
           </div>
           <h2 className="text-3xl font-extrabold text-white tracking-wider">
-            TRANSIT<span className="text-blue-500">OPS</span>
+            KURA<span className="text-blue-500">CHEL</span>
           </h2>
         </div>
         <p className="mt-3 text-center text-sm text-slate-400">

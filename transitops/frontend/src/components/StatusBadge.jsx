@@ -29,8 +29,8 @@ export default function StatusBadge({ status }) {
       case 'On Break':
         return 'bg-amber-100 text-amber-800 border-amber-200';
 
-      // Inactive / Retired
-      case 'Inactive':
+      // Off Duty / Retired
+      case 'Off Duty':
       case 'Retired':
         return 'bg-slate-100 text-slate-500 border-slate-200';
 
