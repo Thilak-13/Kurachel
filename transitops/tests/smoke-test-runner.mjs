@@ -1,4 +1,4 @@
-// TransitOps CRUD Smoke Test Runner
+// Kurachel CRUD smoke test runner
 // Run this script to hit the running backend server and generate pass/fail logs.
 // Usage: node tests/smoke-test-runner.mjs
 
@@ -10,8 +10,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 5000;
 const BASE_URL = `http://localhost:${PORT}/api`;
 
-const adminCreds = { email: 'admin@transitops.com', password: 'adminpassword123' };
-const driverCreds = { email: 'john.doe@transitops.com', password: 'driverpassword123' };
+const adminCreds = { email: 'admin@kurachel.com', password: 'adminpassword123' };
+const driverCreds = { email: 'john.doe@kurachel.com', password: 'driverpassword123' };
 
 async function run() {
   console.log('=== STARTING CRITICAL ENDPOINT SMOKE TESTS ===');

@@ -56,7 +56,7 @@ export default function MainLayout({ children, user, setUser, setIsAuthenticated
 
   const getPageTitle = () => {
     const currentItem = navigationItems.find(item => item.path === location.pathname);
-    return currentItem ? currentItem.name : 'TransitOps';
+    return currentItem ? currentItem.name : 'Kurachel';
   };
 
   return (

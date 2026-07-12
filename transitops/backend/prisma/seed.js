@@ -43,7 +43,7 @@ async function main() {
   // Seeding 4 Management Users requested + 1 Driver User for smoke-test-runner compatibility
   const adminUser = await prisma.user.create({
     data: {
-      email: 'admin@transitops.com',
+      email: 'admin@kurachel.com',
       username: 'admin_user',
       password: adminPassword,
       name: 'Rajesh Sharma',
@@ -53,7 +53,7 @@ async function main() {
 
   const fleetManagerUser = await prisma.user.create({
     data: {
-      email: 'fleet@transitops.com',
+      email: 'fleet@kurachel.com',
       username: 'fleet_user',
       password: fleetPassword,
       name: 'Amit Verma',
@@ -63,7 +63,7 @@ async function main() {
 
   const dispatcherUser = await prisma.user.create({
     data: {
-      email: 'dispatcher@transitops.com',
+      email: 'dispatcher@kurachel.com',
       username: 'dispatcher_user',
       password: dispatcherPassword,
       name: 'Priyanka Patel',
@@ -73,7 +73,7 @@ async function main() {
 
   const maintenanceManagerUser = await prisma.user.create({
     data: {
-      email: 'maintenance@transitops.com',
+      email: 'maintenance@kurachel.com',
       username: 'maint_user',
       password: maintPassword,
       name: 'Vikram Singh',
@@ -83,7 +83,7 @@ async function main() {
 
   const driverUser = await prisma.user.create({
     data: {
-      email: 'john.doe@transitops.com',
+      email: 'john.doe@kurachel.com',
       username: 'driver_john',
       password: driverPassword,
       name: 'John Doe',

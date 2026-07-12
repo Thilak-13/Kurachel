@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Shield, Eye, EyeOff, Lock, Mail } from 'lucide-react';
 
 export default function Login({ setUser, setIsAuthenticated }) {
-  const [email, setEmail] = useState('demo@transitops.com');
+  const [email, setEmail] = useState('admin@kurachel.com');
   const [password, setPassword] = useState('password123');
   const [role, setRole] = useState('Admin');
   const [showPassword, setShowPassword] = useState(false);

@@ -5,11 +5,11 @@ const PORT = process.env.PORT || 5000;
 const BASE_URL = `http://localhost:${PORT}/api`;
 
 const ACCOUNTS = [
-  { label: 'Admin',               email: 'admin@transitops.com',       password: 'adminpassword123' },
-  { label: 'Fleet Manager',       email: 'fleet@transitops.com',        password: 'fleetpassword123' },
-  { label: 'Dispatcher',          email: 'dispatcher@transitops.com',   password: 'dispatchpassword123' },
-  { label: 'Maintenance Manager', email: 'maintenance@transitops.com',  password: 'maintpassword123' },
-  { label: 'Driver',              email: 'john.doe@transitops.com',     password: 'driverpassword123' },
+  { label: 'Admin',               email: 'admin@kurachel.com',       password: 'adminpassword123' },
+  { label: 'Fleet Manager',       email: 'fleet@kurachel.com',        password: 'fleetpassword123' },
+  { label: 'Dispatcher',          email: 'dispatcher@kurachel.com',   password: 'dispatchpassword123' },
+  { label: 'Maintenance Manager', email: 'maintenance@kurachel.com',  password: 'maintpassword123' },
+  { label: 'Driver',              email: 'john.doe@kurachel.com',     password: 'driverpassword123' },
 ];
 
 // Actions to verify — [method, path, body, description, expectedForRole (fn)]

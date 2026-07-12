@@ -46,10 +46,10 @@ function App() {
       try {
         return JSON.parse(saved);
       } catch (e) {
-        return { username: 'admin_user', role: 'Admin', email: 'admin@transitops.com' };
+        return { username: 'admin_user', role: 'Admin', email: 'admin@kurachel.com' };
       }
     }
-    return { username: 'admin_user', role: 'Admin', email: 'admin@transitops.com' };
+    return { username: 'admin_user', role: 'Admin', email: 'admin@kurachel.com' };
   });
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-# TransitOps Frontend - Block 2
+# Kurachel Frontend
 
 This directory contains the React SPA built using Vite and styled with Tailwind CSS.
 
