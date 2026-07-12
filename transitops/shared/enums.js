@@ -1,34 +1,36 @@
-// Shared Enums for TransitOps
+// Shared Enums for TransitOps - Single Source of Truth
+// Exported with Object.freeze to prevent mutation.
 
-const VehicleStatus = {
-  ACTIVE: 'ACTIVE',
-  IN_MAINTENANCE: 'IN_MAINTENANCE',
-  OUT_OF_SERVICE: 'OUT_OF_SERVICE',
-};
+const VehicleStatus = Object.freeze({
+  AVAILABLE: 'Available',
+  ON_TRIP: 'On Trip',
+  IN_SHOP: 'In Shop',
+  RETIRED: 'Retired',
+});
 
-const DriverStatus = {
-  ACTIVE: 'ACTIVE',
-  INACTIVE: 'INACTIVE',
-  ON_TRIP: 'ON_TRIP',
-  ON_BREAK: 'ON_BREAK',
-};
+const DriverStatus = Object.freeze({
+  AVAILABLE: 'Available',
+  ON_TRIP: 'On Trip',
+  SUSPENDED: 'Suspended',
+  OFF_DUTY: 'Off Duty',
+});
 
-const TripStatus = {
-  SCHEDULED: 'SCHEDULED',
-  IN_PROGRESS: 'IN_PROGRESS',
-  COMPLETED: 'COMPLETED',
-  CANCELLED: 'CANCELLED',
-};
+const TripStatus = Object.freeze({
+  DRAFT: 'Draft',
+  DISPATCHED: 'Dispatched',
+  COMPLETED: 'Completed',
+  CANCELLED: 'Cancelled',
+});
 
-const Roles = {
-  ADMIN: 'ADMIN',
-  DISPATCHER: 'DISPATCHER',
-  DRIVER: 'DRIVER',
-};
+const Roles = Object.freeze({
+  ADMIN: 'Admin',
+  DISPATCHER: 'Dispatcher',
+  DRIVER: 'Driver',
+});
 
-module.exports = {
+module.exports = Object.freeze({
   VehicleStatus,
   DriverStatus,
   TripStatus,
   Roles,
-};
+});

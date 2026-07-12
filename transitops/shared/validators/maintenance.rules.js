@@ -1,21 +1,29 @@
-// Maintenance validation rules
+// Maintenance validation rules - Stub Signatures for Block 1
+const { VehicleStatus } = require('../enums');
 
 /**
- * Validates whether maintenance can be scheduled for a vehicle.
- * @param {Object} vehicle - Vehicle object
- * @param {Array<Object>} activeTrips - List of active trips for the vehicle
- * @returns {Object} { isValid: boolean, error?: string }
+ * Checks if maintenance can be opened for a vehicle.
+ * @param {Object} vehicle 
+ * @returns {boolean}
  */
-function validateMaintenance(vehicle, activeTrips) {
-  if (!vehicle) {
-    return { isValid: false, error: 'Vehicle does not exist.' };
-  }
-  if (activeTrips && activeTrips.length > 0) {
-    return { isValid: false, error: 'Cannot schedule maintenance for a vehicle currently on an active trip.' };
-  }
-  return { isValid: true };
+function canOpenMaintenance(vehicle) {
+  // Stub body - to be implemented in Block 2/3
+  return true;
+}
+
+/**
+ * Checks if maintenance can be closed for a vehicle.
+ * @param {Object} vehicle 
+ * @returns {boolean}
+ */
+function canCloseMaintenance(vehicle) {
+  // Stub body - to be implemented in Block 2/3
+  // NOTE: This function must eventually respect a "Retired vehicles stay Retired" guard.
+  // If vehicle.status === VehicleStatus.RETIRED (or 'Retired'), it should remain Retired.
+  return true;
 }
 
 module.exports = {
-  validateMaintenance,
+  canOpenMaintenance,
+  canCloseMaintenance,
 };
