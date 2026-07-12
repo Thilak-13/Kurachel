@@ -1,20 +1,24 @@
 import express from 'express';
 import { verifyToken } from '../middlewares/auth.middleware.js';
 import { requirePermission } from '../middlewares/rbac.middleware.js';
+import { driverValidator } from '../validators/driver.validator.js';
 import * as controller from '../controllers/driver.controller.js';
 
 const router = express.Router();
 
-// GET /api/drivers
+// GET /api/drivers - List all drivers
 router.get('/', verifyToken, requirePermission('driver:view'), controller.getDrivers);
 
-// POST /api/drivers
-router.post('/', verifyToken, requirePermission('driver:create'), controller.createDriver);
+// GET /api/drivers/:id - Get details of a specific driver
+router.get('/:id', verifyToken, requirePermission('driver:view'), controller.getDriverById);
 
-// PUT /api/drivers/:id
-router.put('/:id', verifyToken, requirePermission('driver:update'), controller.updateDriver);
+// POST /api/drivers - Create a new driver record
+router.post('/', verifyToken, requirePermission('driver:create'), driverValidator, controller.createDriver);
 
-// DELETE /api/drivers/:id
+// PUT /api/drivers/:id - Update an existing driver record
+router.put('/:id', verifyToken, requirePermission('driver:update'), driverValidator, controller.updateDriver);
+
+// DELETE /api/drivers/:id - Delete a driver record
 router.delete('/:id', verifyToken, requirePermission('driver:delete'), controller.deleteDriver);
 
 export default router;

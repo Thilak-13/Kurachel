@@ -1,13 +1,20 @@
 import express from 'express';
+import { verifyToken } from '../middlewares/auth.middleware.js';
+import { requirePermission } from '../middlewares/rbac.middleware.js';
+import * as controller from '../controllers/report.controller.js';
+
 const router = express.Router();
 
-// Placeholder for Reports & Dashboard aggregations
-router.get('/dashboard-stats', (req, res) => {
-  res.json({ message: 'GET /api/reports/dashboard-stats - Retrieve dashboard overview metrics (placeholder)' });
-});
+// GET /api/reports - Fetch full reporting stats (includes vehicle reports & fleet summaries)
+router.get('/', verifyToken, requirePermission('report:view'), controller.getReports);
 
-router.get('/summary', (req, res) => {
-  res.json({ message: 'GET /api/reports/summary - Retrieve detailed operational report (placeholder)' });
-});
+// GET /api/reports/operational - Fetch per-vehicle operational ROI and costs (as array)
+router.get('/operational', verifyToken, requirePermission('report:view'), controller.getOperationalReportsOnly);
+
+// GET /api/reports/summary - Fetch operational summary report
+router.get('/summary', verifyToken, requirePermission('report:view'), controller.getReports);
+
+// GET /api/reports/export - Dynamically generate and download CSV sheet
+router.get('/export', verifyToken, requirePermission('report:view'), controller.exportReportsCsv);
 
 export default router;

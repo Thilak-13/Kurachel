@@ -5,13 +5,16 @@ import * as controller from '../controllers/maintenance.controller.js';
 
 const router = express.Router();
 
-// GET /api/maintenance
+// GET /api/maintenance - Retrieve all maintenance records
 router.get('/', verifyToken, requirePermission('maintenance:view'), controller.getMaintenance);
 
-// POST /api/maintenance
+// POST /api/maintenance - Open maintenance for a vehicle
 router.post('/', verifyToken, requirePermission('maintenance:create'), controller.createMaintenance);
 
-// POST /api/maintenance/:id/close
+// POST /api/maintenance/open - Alias route for open maintenance
+router.post('/open', verifyToken, requirePermission('maintenance:create'), controller.createMaintenance);
+
+// POST /api/maintenance/:id/close - Close maintenance and record cost
 router.post('/:id/close', verifyToken, requirePermission('maintenance:update'), controller.closeMaintenance);
 
 export default router;

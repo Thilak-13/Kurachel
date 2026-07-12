@@ -14,6 +14,7 @@ import reportRoutes from './routes/report.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import fuelRoutes from './routes/fuel.routes.js';
 import expenseRoutes from './routes/expense.routes.js';
+import dashboardRoutes from './routes/dashboard.routes.js';
 
 // Load environment variables
 dotenv.config();
@@ -61,11 +62,11 @@ app.use('/api/maintenance', maintenanceRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/fuel-logs', fuelRoutes);
 app.use('/api/expenses', expenseRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to kurachel API' });
 });
-
 
 // 6. Global Error handling
 app.use(notFound);
