@@ -2,21 +2,175 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
 }
 
-// Example User Model
+// --- ENUMS ---
+// Note: SQLite does not support native database enums. 
+// Prisma emulates enums by using text columns and enforcing values in the JS client.
+
+enum UserRole {
+  ADMIN
+  DISPATCHER
+  DRIVER
+  MAINTENANCE_STAFF
+}
+
+enum VehicleStatus {
+  ACTIVE
+  IN_SERVICE
+  OUT_OF_SERVICE
+  DECOMMISSIONED
+}
+
+enum DriverStatus {
+  AVAILABLE
+  ON_TRIP
+  ON_LEAVE
+  INACTIVE
+}
+
+enum TripStatus {
+  SCHEDULED
+  EN_ROUTE
+  COMPLETED
+  CANCELLED
+}
+
+// --- MODELS ---
+
+model Role {
+  id          String   @id @default(uuid())
+  name        UserRole @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]
+
+  @@map("roles")
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
-  name      String?
   password  String
+  name      String?
+  roleId    String
+  role      Role     @relation(fields: [roleId], references: [id])
+  driver    Driver?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([roleId])
   @@map("users")
+}
+
+model Vehicle {
+  id                 String           @id @default(uuid())
+  make               String
+  model              String
+  year               Int
+  registrationNumber String           @unique
+  status             VehicleStatus    @default(ACTIVE)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  trips              Trip[]
+  maintenanceLogs    MaintenanceLog[]
+  fuelLogs           FuelLog[]
+  expenses           Expense[]
+
+  @@index([status])
+  @@map("vehicles")
+}
+
+model Driver {
+  id            String       @id @default(uuid())
+  licenseNumber String       @unique
+  firstName     String
+  lastName      String
+  phone         String?
+  status        DriverStatus @default(AVAILABLE)
+  userId        String?      @unique
+  user          User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  trips         Trip[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([status])
+  @@map("drivers")
+}
+
+model Trip {
+  id            String     @id @default(uuid())
+  tripNumber    String     @unique
+  driverId      String
+  driver        Driver     @relation(fields: [driverId], references: [id])
+  vehicleId     String
+  vehicle       Vehicle    @relation(fields: [vehicleId], references: [id])
+  status        TripStatus @default(SCHEDULED)
+  startLocation String
+  endLocation   String
+  startTime     DateTime?
+  endTime       DateTime?
+  distance      Float?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([driverId])
+  @@index([vehicleId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("trips")
+}
+
+model MaintenanceLog {
+  id          String   @id @default(uuid())
+  vehicleId   String
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  description String
+  cost        Float // SQLite stores Float for currency values
+  performedAt DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([vehicleId])
+  @@index([performedAt])
+  @@map("maintenance_logs")
+}
+
+model FuelLog {
+  id              String   @id @default(uuid())
+  vehicleId       String
+  vehicle         Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  fuelVolume      Float // volume of fuel in liters
+  cost            Float
+  odometerReading Float?
+  loggedAt        DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([vehicleId])
+  @@index([loggedAt])
+  @@map("fuel_logs")
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  vehicleId   String
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  category    String // e.g. Tolls, Insurance, Cleaning, Parking
+  amount      Float
+  description String?
+  spentAt     DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([vehicleId])
+  @@index([category])
+  @@index([spentAt])
+  @@map("expenses")
 }

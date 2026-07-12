@@ -1,19 +1,18 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import pg from 'pg';
+import { PrismaLibSql } from '@prisma/adapter-libsql';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 const connectionString = process.env.DATABASE_URL;
+console.log('db.js loaded. connectionString =', connectionString);
+
+// Create LibSQL database adapter directly from connection string for SQLite support in Prisma 7
+const adapter = new PrismaLibSql({ url: connectionString });
 
 let prisma;
 
-// Create pg connection pool
-const pool = new pg.Pool({ connectionString });
-const adapter = new PrismaPg(pool);
-
-// Configure Prisma Client with selective logging and driver adapter
+// Configure database-agnostic Prisma Client with selective logging
 if (process.env.NODE_ENV === 'production') {
   prisma = new PrismaClient({ 
     adapter,
@@ -31,4 +30,3 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 export default prisma;
-export { pool }; // Export raw pool in case it's needed elsewhere
