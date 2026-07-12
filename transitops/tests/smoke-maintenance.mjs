@@ -43,7 +43,7 @@ async function run() {
 
   // Helper to create a test vehicle
   const createTestVehicle = async (status = 'Available') => {
-    const regNo = `TX-MAIN-${Math.floor(Math.random() * 100000)}`;
+    const regNo = `MH-12-MN-${1000 + Math.floor(Math.random() * 9000)}`;
     const res = await fetch(`${BASE_URL}/vehicles`, {
       method: 'POST',
       headers: getHeaders(),
@@ -72,7 +72,8 @@ async function run() {
 
   // Helper to create a test driver
   const createTestDriver = async () => {
-    const licenseNo = `DL-MAIN-${Math.floor(Math.random() * 1000000)}`;
+    const licenseNo = `DL14 ${30000000000 + Math.floor(Math.random() * 9000000000)}`;
+    const phoneNo = `+91-${9000000000 + Math.floor(Math.random() * 1000000000)}`;
     const res = await fetch(`${BASE_URL}/drivers`, {
       method: 'POST',
       headers: getHeaders(),
@@ -81,7 +82,8 @@ async function run() {
         licenseNumber: licenseNo,
         category: 'Class A',
         licenseExpiryDate: '2030-01-01',
-        contact: '9999999999',
+        contact: phoneNo,
+        phone: phoneNo,
         safetyScore: 95,
         status: 'Available'
       })

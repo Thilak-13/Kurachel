@@ -48,7 +48,7 @@ async function run() {
 
   // Step 1: Register Vehicle
   console.log('\n--- Step 1: Registering Vehicle ---');
-  const regNo = `TX-FLOW-${Math.floor(Math.random() * 100000)}`;
+  const regNo = `MH-12-FL-${1000 + Math.floor(Math.random() * 9000)}`;
   const vRes = await fetch(`${BASE_URL}/vehicles`, {
     method: 'POST',
     headers: getHeaders(),
@@ -67,7 +67,8 @@ async function run() {
 
   // Step 2: Register Driver
   console.log('\n--- Step 2: Registering Driver ---');
-  const licenseNo = `DL-FLOW-${Math.floor(Math.random() * 1000000)}`;
+  const licenseNo = `DL14 ${30000000000 + Math.floor(Math.random() * 9000000000)}`;
+  const phoneNo = `+91-${9000000000 + Math.floor(Math.random() * 1000000000)}`;
   const dRes = await fetch(`${BASE_URL}/drivers`, {
     method: 'POST',
     headers: getHeaders(),
@@ -76,7 +77,8 @@ async function run() {
       licenseNumber: licenseNo,
       category: 'Class A',
       licenseExpiryDate: '2030-01-01',
-      contact: '9999999999',
+      contact: phoneNo,
+      phone: phoneNo,
       safetyScore: 95,
       status: 'Available'
     })

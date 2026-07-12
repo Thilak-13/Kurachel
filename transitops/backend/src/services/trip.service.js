@@ -206,6 +206,8 @@ export const dispatchTrip = async (id) => {
       throw new ApiError(400, `Driver is not available (Status: ${trip.driver.status})`);
     }
 
+    // 2b. Re-validate license expiry + cargo weight INSIDE the transaction (TOCTOU gap fix).
+    // A driver's license could expire after the trip was created but before dispatch.
     validationService.validateLicenseNotExpired(trip.driver);
     if (trip.cargoWeight) {
       validationService.validateCargoWeightLimit(trip.cargoWeight, trip.vehicle);

@@ -270,6 +270,51 @@ async function run() {
     logTest('Cancel completed trip', '/trips/:id/cancel', 'POST', 400, 'ERR_CONN', false, err.message);
   }
 
+  // 6. LICENSE EXPIRY AT DISPATCH — Time-of-check gap regression test
+  // Scenario: Trip created with a VALID driver, then driver's license is expired
+  // in the DB AFTER creation but BEFORE dispatch. Dispatch must be rejected.
+  // This is the most important new test in the final regression pass.
+  try {
+    const v = await createTestVehicle(2000);
+    const d = await createTestDriver('2030-01-01'); // Valid at creation time
+    const trip = await createTestTrip(v.id, d.id, 500);
+
+    // Simulate time passing: directly patch the driver's license expiry to a past date
+    // using the admin PATCH endpoint to expire the license AFTER the trip was created
+    await fetch(`${BASE_URL}/drivers/${d.id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ licenseExpiryDate: '2020-01-01' })
+    });
+
+    // Now attempt dispatch — should be rejected because license is now expired
+    const res = await fetch(`${BASE_URL}/trips/${trip.id}/dispatch`, {
+      method: 'POST',
+      headers: getHeaders()
+    });
+    let data = {};
+    try { data = await res.json(); } catch(e) {}
+
+    const pass = res.status === 400 && (
+      (data.message && data.message.toLowerCase().includes('expired')) ||
+      (data.message && data.message.toLowerCase().includes('license'))
+    );
+
+    logTest(
+      'License expiry at dispatch (TOCTOU gap)',
+      `/trips/:id/dispatch`,
+      'POST',
+      400,
+      res.status,
+      pass,
+      pass
+        ? 'Dispatch correctly rejected expired license after trip creation.'
+        : `Expected 400 + "expired" message. Got: ${res.status} — ${data.message || 'no message'}`
+    );
+  } catch (err) {
+    logTest('License expiry at dispatch (TOCTOU gap)', '/trips/:id/dispatch', 'POST', 400, 'ERR_CONN', false, err.message);
+  }
+
   // Write markdown table logs
   let md = '# Trip Business Rules Smoke Test Logs\n\n';
   md += `Run timestamp: ${new Date().toISOString()}\n\n`;

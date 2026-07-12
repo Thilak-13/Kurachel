@@ -1,6 +1,17 @@
-# TransitOps API Contract
+# Kurachel API Contract
+
+> **Renamed:** This project was formerly branded "TransitOps". It is now **Kurachel**.
 
 This API contract is the single source of truth for the communication between the frontend and the backend.
+
+> **Dispatch Validation Source of Truth (Decision: 2026-07-12)**
+> All dispatch business rules (vehicle availability, driver availability, license expiry, cargo weight) are implemented and enforced exclusively in:
+> **`backend/src/services/validation.service.js`**
+>
+> `shared/validators/dispatch.rules.js` has been **deleted** (it was dead code — never imported in the backend and had diverged from the live logic). Do not recreate it.
+>
+> For reference: `shared/validators/maintenance.rules.js` and `shared/validators/rbac.js` **are** live and imported — do not remove them.
+
 
 ## Error Response Format
 All error responses will have the following JSON structure:
