@@ -1,42 +1,42 @@
 [
   {
     "id": "v1",
-    "registrationNumber": "TX-1234",
-    "model": "Ford Transit 350",
-    "type": "Van",
-    "maxLoadCapacity": 3500,
+    "registrationNumber": "TN 01 AB 1234",
+    "model": "Tata Ultra 1412",
+    "type": "Box Truck",
+    "maxLoadCapacity": 7000,
     "odometer": 45000,
-    "acquisitionCost": 32000,
+    "acquisitionCost": 1850000,
     "status": "Available"
   },
   {
     "id": "v2",
-    "registrationNumber": "TX-9012",
-    "model": "Nissan NV200",
+    "registrationNumber": "MH 12 CD 5678",
+    "model": "Ashok Leyland Dost+",
     "type": "Van",
     "maxLoadCapacity": 1480,
     "odometer": 22500,
-    "acquisitionCost": 24000,
+    "acquisitionCost": 980000,
     "status": "In Shop"
   },
   {
     "id": "v3",
-    "registrationNumber": "TX-8888",
-    "model": "Chevrolet Express",
-    "type": "Van",
-    "maxLoadCapacity": 4200,
+    "registrationNumber": "KA 05 EF 9012",
+    "model": "Eicher Pro 2095",
+    "type": "Flatbed",
+    "maxLoadCapacity": 9200,
     "odometer": 78900,
-    "acquisitionCost": 35000,
+    "acquisitionCost": 2200000,
     "status": "On Trip"
   },
   {
     "id": "v4",
-    "registrationNumber": "TX-5555",
-    "model": "Freightliner M2",
-    "type": "Box Truck",
-    "maxLoadCapacity": 18000,
+    "registrationNumber": "DL 08 GH 3456",
+    "model": "Mahindra Furio 7",
+    "type": "Van",
+    "maxLoadCapacity": 3500,
     "odometer": 125000,
-    "acquisitionCost": 85000,
+    "acquisitionCost": 1450000,
     "status": "Retired"
   }
 ]

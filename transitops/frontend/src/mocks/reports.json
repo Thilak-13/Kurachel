@@ -1,7 +1,7 @@
 {
   "fleetUptime": 94.2,
   "completedTripsCount": 1120,
-  "fuelExpenses": 34500,
+  "fuelExpenses": 2845000,
   "maintenanceDowntimeHours": 18,
   "monthlyStats": [
     { "month": "Jan", "trips": 950, "uptime": 93.5 },
@@ -14,98 +14,98 @@
   "vehicleReports": [
     {
       "id": "r1",
-      "vehicle": "Ford Transit",
-      "registrationNumber": "TX-1234",
+      "vehicle": "Tata Ultra 1412",
+      "registrationNumber": "TN 01 AB 1234",
       "distanceTravelled": 12400,
       "fuelConsumed": 1240,
       "fuelEfficiency": 10.0,
-      "fuelCost": 4340,
-      "maintenanceCost": 850,
-      "operationalCost": 5190,
-      "revenue": 9800,
-      "roi": 88.8
+      "fuelCost": 385600,
+      "maintenanceCost": 72000,
+      "operationalCost": 457600,
+      "revenue": 820000,
+      "roi": 79.2
     },
     {
       "id": "r2",
-      "vehicle": "Mercedes Sprinter",
-      "registrationNumber": "TX-5678",
+      "vehicle": "Ashok Leyland Dost+",
+      "registrationNumber": "MH 12 CD 5678",
       "distanceTravelled": 9800,
       "fuelConsumed": 1470,
       "fuelEfficiency": 6.7,
-      "fuelCost": 5145,
-      "maintenanceCost": 1200,
-      "operationalCost": 6345,
-      "revenue": 11200,
-      "roi": 76.5
+      "fuelCost": 457200,
+      "maintenanceCost": 98000,
+      "operationalCost": 555200,
+      "revenue": 945000,
+      "roi": 70.2
     },
     {
       "id": "r3",
-      "vehicle": "Volvo FH16",
-      "registrationNumber": "TX-9012",
+      "vehicle": "Eicher Pro 2095",
+      "registrationNumber": "KA 05 EF 9012",
       "distanceTravelled": 18200,
       "fuelConsumed": 2184,
       "fuelEfficiency": 8.3,
-      "fuelCost": 7644,
-      "maintenanceCost": 2100,
-      "operationalCost": 9744,
-      "revenue": 21500,
-      "roi": 120.7
+      "fuelCost": 679200,
+      "maintenanceCost": 175000,
+      "operationalCost": 854200,
+      "revenue": 1820000,
+      "roi": 113.1
     },
     {
       "id": "r4",
-      "vehicle": "Isuzu NPR",
-      "registrationNumber": "TX-3456",
+      "vehicle": "Mahindra Furio 7",
+      "registrationNumber": "DL 08 GH 3456",
       "distanceTravelled": 7200,
       "fuelConsumed": 864,
       "fuelEfficiency": 8.3,
-      "fuelCost": 3024,
-      "maintenanceCost": 450,
-      "operationalCost": 3474,
-      "revenue": 6800,
-      "roi": 95.7
+      "fuelCost": 268800,
+      "maintenanceCost": 38000,
+      "operationalCost": 306800,
+      "revenue": 580000,
+      "roi": 89.1
     },
     {
       "id": "r5",
-      "vehicle": "Kenworth T680",
-      "registrationNumber": "TX-7890",
+      "vehicle": "VECV Eicher Pro 6016",
+      "registrationNumber": "GJ 01 IJ 7890",
       "distanceTravelled": 22600,
       "fuelConsumed": 3390,
       "fuelEfficiency": 6.7,
-      "fuelCost": 11865,
-      "maintenanceCost": 3200,
-      "operationalCost": 15065,
-      "revenue": 28000,
-      "roi": 85.9
+      "fuelCost": 1054800,
+      "maintenanceCost": 265000,
+      "operationalCost": 1319800,
+      "revenue": 2380000,
+      "roi": 80.3
     }
   ],
   "analyticsCharts": {
     "fuelEfficiency": [
-      { "vehicle": "TX-1234", "efficiency": 10.0 },
-      { "vehicle": "TX-5678", "efficiency": 6.7 },
-      { "vehicle": "TX-9012", "efficiency": 8.3 },
-      { "vehicle": "TX-3456", "efficiency": 8.3 },
-      { "vehicle": "TX-7890", "efficiency": 6.7 }
+      { "vehicle": "TN 01 AB 1234", "efficiency": 10.0 },
+      { "vehicle": "MH 12 CD 5678", "efficiency": 6.7 },
+      { "vehicle": "KA 05 EF 9012", "efficiency": 8.3 },
+      { "vehicle": "DL 08 GH 3456", "efficiency": 8.3 },
+      { "vehicle": "GJ 01 IJ 7890", "efficiency": 6.7 }
     ],
     "operationalCost": [
-      { "vehicle": "TX-1234", "cost": 5190 },
-      { "vehicle": "TX-5678", "cost": 6345 },
-      { "vehicle": "TX-9012", "cost": 9744 },
-      { "vehicle": "TX-3456", "cost": 3474 },
-      { "vehicle": "TX-7890", "cost": 15065 }
+      { "vehicle": "TN 01 AB 1234", "cost": 457600 },
+      { "vehicle": "MH 12 CD 5678", "cost": 555200 },
+      { "vehicle": "KA 05 EF 9012", "cost": 854200 },
+      { "vehicle": "DL 08 GH 3456", "cost": 306800 },
+      { "vehicle": "GJ 01 IJ 7890", "cost": 1319800 }
     ],
     "revenue": [
-      { "vehicle": "TX-1234", "revenue": 9800 },
-      { "vehicle": "TX-5678", "revenue": 11200 },
-      { "vehicle": "TX-9012", "revenue": 21500 },
-      { "vehicle": "TX-3456", "revenue": 6800 },
-      { "vehicle": "TX-7890", "revenue": 28000 }
+      { "vehicle": "TN 01 AB 1234", "revenue": 820000 },
+      { "vehicle": "MH 12 CD 5678", "revenue": 945000 },
+      { "vehicle": "KA 05 EF 9012", "revenue": 1820000 },
+      { "vehicle": "DL 08 GH 3456", "revenue": 580000 },
+      { "vehicle": "GJ 01 IJ 7890", "revenue": 2380000 }
     ],
     "roi": [
-      { "vehicle": "TX-1234", "roi": 88.8 },
-      { "vehicle": "TX-5678", "roi": 76.5 },
-      { "vehicle": "TX-9012", "roi": 120.7 },
-      { "vehicle": "TX-3456", "roi": 95.7 },
-      { "vehicle": "TX-7890", "roi": 85.9 }
+      { "vehicle": "TN 01 AB 1234", "roi": 79.2 },
+      { "vehicle": "MH 12 CD 5678", "roi": 70.2 },
+      { "vehicle": "KA 05 EF 9012", "roi": 113.1 },
+      { "vehicle": "DL 08 GH 3456", "roi": 89.1 },
+      { "vehicle": "GJ 01 IJ 7890", "roi": 80.3 }
     ]
   }
 }

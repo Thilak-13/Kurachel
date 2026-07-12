@@ -32,7 +32,7 @@ export default function CompleteTripModal({ isOpen, onClose, onSubmit, trip, veh
       if (isNaN(odo)) {
         newErrors.finalOdometer = 'Must be a valid number';
       } else if (vehicle && odo < vehicle.odometer) {
-        newErrors.finalOdometer = `Final odometer must be at least the current odometer (${vehicle.odometer} mi)`;
+        newErrors.finalOdometer = `Final odometer must be at least the current odometer (${vehicle.odometer} km)`;
       }
     }
 
@@ -72,7 +72,7 @@ export default function CompleteTripModal({ isOpen, onClose, onSubmit, trip, veh
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                Final Odometer (mi) *
+                Final Odometer (km) *
               </label>
               <input
                 type="number"
@@ -88,7 +88,7 @@ export default function CompleteTripModal({ isOpen, onClose, onSubmit, trip, veh
 
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                Fuel Used (gallons) *
+                Fuel Used (litres) *
               </label>
               <input
                 type="number"

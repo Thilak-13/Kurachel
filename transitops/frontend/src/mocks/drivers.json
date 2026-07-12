@@ -1,41 +1,41 @@
 [
   {
     "id": "d1",
-    "name": "Jane Doe",
-    "licenseNumber": "DL-987654",
+    "name": "Rajesh Kumar",
+    "licenseNumber": "TN-2019-0012345",
     "licenseCategory": "Class A",
     "licenseExpiryDate": "2028-11-23",
-    "phoneNumber": "555-0199",
+    "phoneNumber": "9876543210",
     "safetyScore": 95,
     "status": "Available"
   },
   {
     "id": "d2",
-    "name": "John Smith",
-    "licenseNumber": "DL-123456",
+    "name": "Suresh Babu",
+    "licenseNumber": "MH-2020-0067890",
     "licenseCategory": "Class B",
     "licenseExpiryDate": "2027-04-12",
-    "phoneNumber": "555-0144",
+    "phoneNumber": "9845123456",
     "safetyScore": 88,
     "status": "On Trip"
   },
   {
     "id": "d3",
-    "name": "Alice Johnson",
-    "licenseNumber": "DL-456789",
+    "name": "Priya Lakshmi",
+    "licenseNumber": "KA-2018-0034567",
     "licenseCategory": "Class A",
     "licenseExpiryDate": "2026-09-08",
-    "phoneNumber": "555-0188",
+    "phoneNumber": "9901234567",
     "safetyScore": 72,
     "status": "Suspended"
   },
   {
     "id": "d4",
-    "name": "Bob Williams",
-    "licenseNumber": "DL-789012",
+    "name": "Mohan Rajan",
+    "licenseNumber": "DL-2021-0089012",
     "licenseCategory": "Class C",
     "licenseExpiryDate": "2029-01-30",
-    "phoneNumber": "555-0122",
+    "phoneNumber": "9712345678",
     "safetyScore": 90,
     "status": "Inactive"
   }

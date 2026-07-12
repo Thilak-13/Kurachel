@@ -59,9 +59,9 @@ export async function getReportData(filters = {}) {
  */
 export async function exportReportCSV(rows) {
   const headers = [
-    'Vehicle', 'Registration Number', 'Distance (mi)', 'Fuel Consumed (gal)',
-    'Fuel Efficiency (mpg)', 'Fuel Cost ($)', 'Maintenance Cost ($)',
-    'Operational Cost ($)', 'Revenue ($)', 'ROI (%)'
+    'Vehicle', 'Registration Number', 'Distance (km)', 'Fuel Consumed (L)',
+    'Fuel Efficiency (km/L)', 'Fuel Cost (₹)', 'Maintenance Cost (₹)',
+    'Operational Cost (₹)', 'Revenue (₹)', 'ROI (%)'
   ];
 
   const csvRows = rows.map(r => [

@@ -38,8 +38,8 @@ export default function TripTable({ trips, vehicles, drivers, onDispatch, onEdit
               <td className="py-4 px-6 font-bold text-slate-900">{trip.destination}</td>
               <td className="py-4 px-6 text-xs">{getVehicleLabel(trip.vehicleId)}</td>
               <td className="py-4 px-6 text-xs">{getDriverLabel(trip.driverId)}</td>
-              <td className="py-4 px-6">{Number(trip.cargoWeight).toLocaleString()} lbs</td>
-              <td className="py-4 px-6">{Number(trip.plannedDistance).toLocaleString()} mi</td>
+              <td className="py-4 px-6">{Number(trip.cargoWeight).toLocaleString('en-IN')} kg</td>
+              <td className="py-4 px-6">{Number(trip.plannedDistance).toLocaleString('en-IN')} km</td>
               <td className="py-4 px-6">
                 <StatusBadge status={trip.status} />
               </td>

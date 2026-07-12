@@ -101,10 +101,10 @@ export default function Reports({ user }) {
 
   // ── Highlight KPIs ─────────────────────────
   const highlights = data ? [
-    { name: 'Fleet Uptime',       value: `${data.fleetUptime}%`,                     icon: TrendingUp,  color: 'text-emerald-600 bg-emerald-50' },
-    { name: 'Completed Trips',    value: data.completedTripsCount.toLocaleString(),   icon: FileText,    color: 'text-blue-600 bg-blue-50' },
-    { name: 'Fuel Expenses',      value: `$${data.fuelExpenses.toLocaleString()}`,    icon: DollarSign,  color: 'text-indigo-600 bg-indigo-50' },
-    { name: 'Maintenance Downtime', value: `${data.maintenanceDowntimeHours} hrs`,    icon: Clock,       color: 'text-amber-600 bg-amber-50' },
+    { name: 'Fleet Uptime',          value: `${data.fleetUptime}%`,                                        icon: TrendingUp,  color: 'text-emerald-600 bg-emerald-50' },
+    { name: 'Completed Trips',       value: data.completedTripsCount.toLocaleString('en-IN'),            icon: FileText,    color: 'text-blue-600 bg-blue-50' },
+    { name: 'Fuel Expenses',         value: `₹${data.fuelExpenses.toLocaleString('en-IN')}`,             icon: DollarSign,  color: 'text-indigo-600 bg-indigo-50' },
+    { name: 'Maintenance Downtime',  value: `${data.maintenanceDowntimeHours} hrs`,                      icon: Clock,       color: 'text-amber-600 bg-amber-50' },
   ] : [];
 
   const rows         = data?.vehicleReports || [];
@@ -233,7 +233,7 @@ export default function Reports({ user }) {
       {/* ── Analytics Charts ─────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Fuel Efficiency Bar Chart */}
-        <ChartCard title="Fuel Efficiency (mpg)" subtitle="Miles per gallon by vehicle registration">
+        <ChartCard title="Fuel Efficiency (km/L)" subtitle="Kilometres per litre by vehicle registration">
           <div className="h-60">
             {loading
               ? <div className="h-full bg-slate-100 rounded-xl animate-pulse" />
@@ -242,9 +242,9 @@ export default function Reports({ user }) {
                   <BarChart data={charts.fuelEfficiency || []} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                     <XAxis dataKey="vehicle" tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 11 }} />
-                    <YAxis tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 11 }} unit=" mpg" />
+                    <YAxis tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 11 }} unit=" km/L" />
                     <Tooltip content={<DarkTooltip />} cursor={{ fill: '#f8fafc' }} />
-                    <Bar dataKey="efficiency" name="Fuel Efficiency (mpg)" fill={PALETTE.emerald}
+                    <Bar dataKey="efficiency" name="Fuel Efficiency (km/L)" fill={PALETTE.emerald}
                       radius={[6, 6, 0, 0]} maxBarSize={40} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -253,7 +253,7 @@ export default function Reports({ user }) {
         </ChartCard>
 
         {/* Operational Cost Bar Chart */}
-        <ChartCard title="Operational Cost ($)" subtitle="Total operating costs by vehicle">
+        <ChartCard title="Operational Cost (₹)" subtitle="Total operating costs by vehicle">
           <div className="h-60">
             {loading
               ? <div className="h-full bg-slate-100 rounded-xl animate-pulse" />
@@ -263,9 +263,9 @@ export default function Reports({ user }) {
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                     <XAxis dataKey="vehicle" tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 11 }} />
                     <YAxis tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 11 }}
-                      tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
+                      tickFormatter={v => `₹${(v / 100000).toFixed(1)}L`} />
                     <Tooltip content={<DarkTooltip />} cursor={{ fill: '#f8fafc' }} />
-                    <Bar dataKey="cost" name="Operational Cost ($)" fill={PALETTE.amber}
+                    <Bar dataKey="cost" name="Operational Cost (₹)" fill={PALETTE.amber}
                       radius={[6, 6, 0, 0]} maxBarSize={40} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -274,7 +274,7 @@ export default function Reports({ user }) {
         </ChartCard>
 
         {/* Revenue Line Chart */}
-        <ChartCard title="Revenue ($)" subtitle="Total revenue generated per vehicle">
+        <ChartCard title="Revenue (₹)" subtitle="Total revenue generated per vehicle">
           <div className="h-60">
             {loading
               ? <div className="h-full bg-slate-100 rounded-xl animate-pulse" />
@@ -284,9 +284,9 @@ export default function Reports({ user }) {
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                     <XAxis dataKey="vehicle" tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 11 }} />
                     <YAxis tickLine={false} axisLine={false} tick={{ fill: '#64748b', fontSize: 11 }}
-                      tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
+                      tickFormatter={v => `₹${(v / 100000).toFixed(1)}L`} />
                     <Tooltip content={<DarkTooltip />} />
-                    <Line type="monotone" dataKey="revenue" name="Revenue ($)" stroke={PALETTE.blue}
+                    <Line type="monotone" dataKey="revenue" name="Revenue (₹)" stroke={PALETTE.blue}
                       strokeWidth={2.5} dot={{ r: 4, fill: PALETTE.blue }} activeDot={{ r: 6 }} />
                   </LineChart>
                 </ResponsiveContainer>
@@ -333,13 +333,13 @@ export default function Reports({ user }) {
               <tr className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 <th className="py-3.5 px-5">Vehicle</th>
                 <th className="py-3.5 px-5">Reg. Number</th>
-                <th className="py-3.5 px-5">Distance (mi)</th>
-                <th className="py-3.5 px-5">Fuel (gal)</th>
-                <th className="py-3.5 px-5">Efficiency (mpg)</th>
-                <th className="py-3.5 px-5">Fuel Cost ($)</th>
-                <th className="py-3.5 px-5">Maint. Cost ($)</th>
-                <th className="py-3.5 px-5">Op. Cost ($)</th>
-                <th className="py-3.5 px-5">Revenue ($)</th>
+                <th className="py-3.5 px-5">Distance (km)</th>
+                <th className="py-3.5 px-5">Fuel (L)</th>
+                <th className="py-3.5 px-5">Efficiency (km/L)</th>
+                <th className="py-3.5 px-5">Fuel Cost (₹)</th>
+                <th className="py-3.5 px-5">Maint. Cost (₹)</th>
+                <th className="py-3.5 px-5">Op. Cost (₹)</th>
+                <th className="py-3.5 px-5">Revenue (₹)</th>
                 <th className="py-3.5 px-5">ROI (%)</th>
               </tr>
             </thead>
@@ -369,13 +369,13 @@ export default function Reports({ user }) {
                       <tr key={row.id} className="hover:bg-slate-50/60 transition-colors">
                         <td className="py-3.5 px-5 font-bold text-slate-900">{row.vehicle}</td>
                         <td className="py-3.5 px-5 font-semibold text-slate-500">{row.registrationNumber}</td>
-                        <td className="py-3.5 px-5 tabular-nums">{row.distanceTravelled.toLocaleString()}</td>
-                        <td className="py-3.5 px-5 tabular-nums">{row.fuelConsumed.toLocaleString()}</td>
-                        <td className="py-3.5 px-5 tabular-nums font-bold text-emerald-600">{row.fuelEfficiency}</td>
-                        <td className="py-3.5 px-5 tabular-nums">${row.fuelCost.toLocaleString()}</td>
-                        <td className="py-3.5 px-5 tabular-nums">${row.maintenanceCost.toLocaleString()}</td>
-                        <td className="py-3.5 px-5 tabular-nums font-bold text-amber-600">${row.operationalCost.toLocaleString()}</td>
-                        <td className="py-3.5 px-5 tabular-nums font-bold text-blue-600">${row.revenue.toLocaleString()}</td>
+                        <td className="py-3.5 px-5 tabular-nums">{row.distanceTravelled.toLocaleString('en-IN')} km</td>
+                        <td className="py-3.5 px-5 tabular-nums">{row.fuelConsumed.toLocaleString('en-IN')} L</td>
+                        <td className="py-3.5 px-5 tabular-nums font-bold text-emerald-600">{row.fuelEfficiency} km/L</td>
+                        <td className="py-3.5 px-5 tabular-nums">₹{row.fuelCost.toLocaleString('en-IN')}</td>
+                        <td className="py-3.5 px-5 tabular-nums">₹{row.maintenanceCost.toLocaleString('en-IN')}</td>
+                        <td className="py-3.5 px-5 tabular-nums font-bold text-amber-600">₹{row.operationalCost.toLocaleString('en-IN')}</td>
+                        <td className="py-3.5 px-5 tabular-nums font-bold text-blue-600">₹{row.revenue.toLocaleString('en-IN')}</td>
                         <td className="py-3.5 px-5">
                           <span className={`inline-flex px-2 py-1 rounded-full text-xs font-extrabold
                             ${roiGood

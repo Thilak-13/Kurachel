@@ -62,11 +62,11 @@ export default function ViewTripModal({ isOpen, onClose, trip, vehicle, driver }
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-400 font-bold flex items-center gap-1.5">Cargo Weight</span>
-                <span className="font-bold text-slate-800">{Number(trip.cargoWeight).toLocaleString()} lbs</span>
+                <span className="font-bold text-slate-800">{Number(trip.cargoWeight).toLocaleString('en-IN')} kg</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-400 font-bold flex items-center gap-1.5">Route Distance</span>
-                <span className="font-bold text-slate-800">{Number(trip.plannedDistance).toLocaleString()} miles</span>
+                <span className="font-bold text-slate-800">{Number(trip.plannedDistance).toLocaleString('en-IN')} km</span>
               </div>
             </div>
 

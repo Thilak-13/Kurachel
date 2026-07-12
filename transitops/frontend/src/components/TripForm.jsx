@@ -163,7 +163,7 @@ export default function TripForm({ isOpen, onClose, onSubmit, trip, availableVeh
                   name="source"
                   value={formData.source}
                   onChange={handleChange}
-                  placeholder="e.g. Houston Hub"
+                  placeholder="e.g. Chennai Hub"
                   className={`w-full px-3.5 py-2.5 text-sm bg-slate-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                     errors.source ? 'border-red-300 focus:ring-red-500' : 'border-slate-200'
                   }`}
@@ -182,7 +182,7 @@ export default function TripForm({ isOpen, onClose, onSubmit, trip, availableVeh
                   name="destination"
                   value={formData.destination}
                   onChange={handleChange}
-                  placeholder="e.g. Austin Depot"
+                  placeholder="e.g. Bengaluru Depot"
                   className={`w-full px-3.5 py-2.5 text-sm bg-slate-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                     errors.destination ? 'border-red-300 focus:ring-red-500' : 'border-slate-200'
                   }`}
@@ -209,7 +209,7 @@ export default function TripForm({ isOpen, onClose, onSubmit, trip, availableVeh
                   <option value="">-- Select Available Vehicle --</option>
                   {finalVehicles.map(v => (
                     <option key={v.id} value={v.id}>
-                      {v.registrationNumber} ({v.model} - Max Load: {v.maxLoadCapacity} lbs)
+                      {v.registrationNumber} ({v.model} - Max Load: {v.maxLoadCapacity} kg)
                     </option>
                   ))}
                 </select>
@@ -246,7 +246,7 @@ export default function TripForm({ isOpen, onClose, onSubmit, trip, availableVeh
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  Cargo Weight (lbs) *
+                  Cargo Weight (kg) *
                 </label>
                 <input
                   type="number"
@@ -265,7 +265,7 @@ export default function TripForm({ isOpen, onClose, onSubmit, trip, availableVeh
 
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  Distance (mi) *
+                  Distance (km) *
                 </label>
                 <input
                   type="number"
