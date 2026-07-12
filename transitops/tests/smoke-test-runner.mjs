@@ -1,4 +1,4 @@
-// TransitOps CRUD Smoke Test Runner
+// Kurachel CRUD smoke test runner
 // Run this script to hit the running backend server and generate pass/fail logs.
 // Usage: node tests/smoke-test-runner.mjs
 

@@ -1,7 +1,5 @@
 # Kurachel — Fleet & Logistics Operations Portal
 
-> **Formerly branded "TransitOps"**. Renamed to **Kurachel** as of the final hackathon sprint.
-
 A full-stack fleet management system for tracking vehicles, drivers, trips, fuel, maintenance, and operational ROI analytics.
 
 ---
@@ -88,15 +86,15 @@ npm run dev          # runs on http://localhost:5173
 
 ## Demo Credentials
 
-All accounts use the `@transitops.com` domain (seed file uses old branding; emails will be updated in a post-hackathon cleanup pass).
+All demo accounts use the `@kurachel.com` domain.
 
 | Role                | Email                          | Password              |
 |---------------------|--------------------------------|-----------------------|
-| Admin               | admin@transitops.com           | adminpassword123      |
-| Fleet Manager       | fleet@transitops.com           | fleetpassword123      |
-| Dispatcher          | dispatcher@transitops.com      | dispatchpassword123   |
-| Maintenance Manager | maintenance@transitops.com     | maintpassword123      |
-| Driver              | john.doe@transitops.com        | driverpassword123     |
+| Admin               | admin@kurachel.com             | adminpassword123      |
+| Fleet Manager       | fleet@kurachel.com             | fleetpassword123      |
+| Dispatcher          | dispatcher@kurachel.com        | dispatchpassword123   |
+| Maintenance Manager | maintenance@kurachel.com       | maintpassword123      |
+| Driver              | john.doe@kurachel.com          | driverpassword123     |
 
 > **Note:** John Doe is intentionally kept as a non-Indian name for smoke-test compatibility (used as the seeded driver user linked to a User account).
 
@@ -140,9 +138,7 @@ All dispatch business rules are enforced in **`backend/src/services/validation.s
 
 1. **Duplicate Driver fields:** The `Driver` schema has both `firstName`/`lastName` AND a denormalized `name` field, and both `contact` AND `phone` fields. These exist because the initial scaffold and the seed script were written independently. A post-hackathon migration should consolidate to `name` + `contact` only.
 
-2. **Seed email domain:** Demo accounts use `@transitops.com` instead of `@kurachel.com`. A rename pass is needed after the hackathon.
-
-3. **Trip `cargoWeight` not persisted:** The `Trip` schema does not have a `cargoWeight` column. Cargo weight is validated at trip **creation** time, but the validated value is not stored on the trip record. The dispatch transaction re-validates using the vehicle's `maxLoadCapacity`, but cannot re-check the originally submitted cargo weight (it's lost after creation). A `cargoWeight Float?` column on `Trip` is the recommended fix.
+The current schema persists `Trip.cargoWeight` and `MaintenanceLog.status`; these were added by migration `20260712083051_add_cargo_weight_and_maintenance_status`.
 
 ---
 

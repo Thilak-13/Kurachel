@@ -1,24 +1,25 @@
-# Kurachel — Grader Demo Script
-## Sync Checkpoint 4 Final Demo
+# Kurachel Demo Script
 
-**Estimated duration:** ~8 minutes  
-**Key highlight:** License-expiry-at-dispatch rejection (deliberate TOCTOU race condition catch — not a scripted happy path)
+This script guides graders and developers through demonstrating the core functionality and verified security fixes of the **Kurachel (formerly TransitOps)** fleet management backend.
 
 ---
 
-## Pre-Demo Setup
+## Preparation
 
-```bash
-# Ensure servers are running:
-cd transitops/backend && npm run dev     # port 5000
-cd transitops/frontend && npm run dev   # port 5173
-
-# Optional: Reset + reseed for a clean demo
-npx prisma migrate reset --force
-npm run db:seed
-```
-
-Open `http://localhost:5173` in a browser.
+Ensure your environment is set up:
+1. Re-initialize database & seed:
+   ```bash
+   npx prisma migrate reset --force
+   ```
+2. Start the API backend:
+   ```bash
+   npm run dev
+   ```
+3. Start the Frontend development server:
+   ```bash
+   npm run dev
+   ```
+   Open `http://localhost:5173` in a browser.
 
 ---
 
@@ -38,96 +39,76 @@ Open `http://localhost:5173` in a browser.
 ## Step 2 — Register an Indian Vehicle
 
 1. Navigate to **Vehicles** in the sidebar
-2. Click **+ Add Vehicle**
-3. Fill in:
-   - **Registration:** `MH-14-KR-9001`
-   - **Make:** Tata
-   - **Model:** Prima 4028.S
-   - **Type:** Heavy Commercial Vehicle
-   - **Max Load:** `28000` kg
-   - **Odometer:** `0`
-   - **Cost:** `4500000`
-4. Click **Save**
-5. ✅ Vehicle appears in the list with status **Available**
+2. Click **Add Vehicle**
+3. Enter details:
+   - **Registration Number:** `MH-12-PQ-4567` (or similar conforming format)
+   - **Model:** `Tata Ultra T.7`
+   - **Max Load Capacity (kg):** `4500`
+   - **Odometer (km):** `12000`
+   - **Acquisition Cost (INR):** `1200000`
+4. Click **Save Vehicle**
+5. ✅ Vehicle appears on the list.
+
+> **Validation Demo:** Try adding a vehicle with status "Junk" or invalid format like `MH-12-PQ-45678` — note that backend validators block it with `DUPLICATE_REG_NUMBER` or `VALIDATION_ERROR` (Status 409/400).
 
 ---
 
-## Step 3 — Register a Driver
+## Step 3 — Register a Driver (Indian license)
 
 1. Navigate to **Drivers** in the sidebar
-2. Click **+ Add Driver**
-3. Fill in:
-   - **Name:** Arjun Mehta
-   - **License No:** `MH-DL-2024-888`
-   - **Category:** Class A (Heavy)
-   - **License Expiry:** `2030-12-31`
-   - **Contact:** `9876543210`
+2. Click **Add Driver**
+3. Enter details:
+   - **Name:** `Vikramaditya Rao`
+   - **License Number:** `DL14 20180098765` (conforms to `^[A-Z]{2}\d{2}\s?\d{11}$`)
+   - **License Expiry:** `2032-08-15` (Valid future date)
+   - **Contact Phone:** `+91-9876543210`
    - **Safety Score:** `92`
-4. Click **Save**
-5. ✅ Driver appears with status **Available**
+4. Click **Save Driver**
+5. ✅ Driver appears on the list.
 
 ---
 
-## Step 4 — Demonstrate the License Expiry Rejection (THE KEY DEMO MOMENT)
+## Step 4 — Create a Draft Trip & Demonstrate Expiry Rejection (Safety Fix 1)
 
-> **Context for graders:** This test exposes a subtle time-of-check vs time-of-use (TOCTOU) gap. A dispatcher creates a trip with a valid driver, but the driver's license expires (or is suspended by HR) **after** the trip is created. Without the fix, dispatch would proceed with an expired license. **This was caught and fixed in this review pass.**
+This shows the time-of-check safety validation protecting dispatch against later-expired licenses.
 
-### 4a — Create a trip with the new driver
-1. Navigate to **Trips** → **+ New Trip**
-2. Select the vehicle `MH-14-KR-9001` and driver `Arjun Mehta`
-3. Set:
-   - **Route:** Mumbai → Pune
-   - **Cargo Weight:** `15000` kg
-4. Click **Create** → ✅ Trip created in **Draft** status
-
-### 4b — Simulate license expiry AFTER trip creation
-Using the API directly (or via Drivers page **Edit**):
-- Update Arjun Mehta's license expiry to `2020-01-01` (a past date)
-
-_Via REST:_
-```bash
-curl -X PUT http://localhost:5000/api/drivers/{driverId} \
-  -H "Authorization: Bearer {adminToken}" \
-  -H "Content-Type: application/json" \
-  -d '{"licenseExpiryDate": "2020-01-01"}'
-```
-
-### 4c — Attempt Dispatch → Show rejection
-1. Back on the Trips page, click **Dispatch** on the draft trip
-2. ❌ Server returns `400 Bad Request`:
-   ```json
-   {
-     "message": "Driver license is expired (Expiry date: 2020-01-01). Cannot dispatch.",
-     "success": false
-   }
-   ```
-3. **Point out:** This check happens **inside the Prisma `$transaction`** — it re-reads the driver's live `licenseExpiryDate` at the moment of dispatch, not at trip creation time.
-
-### 4d — Fix the driver, dispatch successfully
-1. Update Arjun Mehta's license expiry back to `2030-12-31`
-2. Click **Dispatch** again
-3. ✅ Trip status → **Dispatched**; Vehicle status → **On Trip**; Driver status → **On Trip**
+1. Navigate to **Trips** in the sidebar
+2. Click **Create Trip** (Draft status)
+3. Select the vehicle and driver registered in Steps 2 & 3
+4. Enter locations:
+   - **From:** `Mumbai, MH`
+   - **To:** `Pune, MH`
+   - **Cargo Weight (kg):** `3000` (Fails if > vehicle capacity!)
+5. Click **Save Draft** → ✅ Trip is saved successfully as Draft.
+6. Now, navigate to **Drivers** and click Edit on Vikramaditya Rao.
+7. Change their **License Expiry** to a past date (e.g., `2020-01-01`) and save.
+8. Go back to **Trips** and click **Dispatch** on the draft trip.
+9. ❌ **Expected Result:** Dispatch fails with a clear warning: "Driver license is expired" (Status 400, `VALIDATION_ERROR`).
+10. Edit the driver's license expiry back to a future date (`2032-08-15`), return to Trips, and click **Dispatch** again → ✅ Dispatch succeeds! Trip status updates to **Dispatched**.
 
 ---
 
-## Step 5 — Complete the Trip
+## Step 5 — Complete the Trip & Log Fuel
 
-1. Click **Complete** on the dispatched trip
-2. Enter:
-   - **Final Odometer:** `350`
-   - **Fuel Consumed:** `42`
+1. Under **Trips**, click **Complete** on the dispatched trip.
+2. Enter completion details:
+   - **Final Odometer:** `12150` (+150 km)
+   - **Fuel Consumed (Liters):** `15`
+   - **Remarks:** `Smooth delivery via Expressway`
 3. Click **Submit**
-4. ✅ Trip → **Completed**; Vehicle → **Available**; Driver → **Available**
+4. ✅ Trip transitions to **Completed**.
+5. ✅ Vehicle odometer increases automatically.
+6. ✅ A new fuel log is automatically logged on the vehicle with the reported volume.
 
 ---
 
-## Step 6 — Open Maintenance
+## Step 6 — Open Maintenance (Grounded Override)
 
-1. Navigate to **Maintenance** → **+ Open Ticket**
-2. Select vehicle `MH-14-KR-9001`
-3. Enter:
-   - **Type:** Routine
-   - **Description:** Post-trip brake inspection
+1. Navigate to **Maintenance** in the sidebar
+2. Click **Log Service**
+3. Select the vehicle and enter:
+   - **Type:** `Brake Inspection`
+   - **Description:** `Post-trip brake inspection`
 4. Click **Open**
 5. ✅ Vehicle status immediately → **In Shop** (grounding override — even mid-trip vehicles are grounded)
 
@@ -139,10 +120,8 @@ curl -X PUT http://localhost:5000/api/drivers/{driverId} \
 2. Enter **Cost:** `2500`
 3. Click **Close Ticket**
 4. ✅ Vehicle status → **Available** (Retired vehicles stay Retired — verified in smoke tests)
-
 5. Navigate to **Dashboard**
 6. ✅ KPIs updated in real time — vehicle is now counted as Available again
-
 7. Navigate to **Reports** → ✅ The vehicle's operational cost, fuel efficiency (km/L), and ROI % appear in the analytics table.
 
 ---
@@ -152,6 +131,7 @@ curl -X PUT http://localhost:5000/api/drivers/{driverId} \
 1. Log out → Log in as **Dispatcher** (`dispatcher@kurachel.com` / `dispatchpassword123`)
 2. ✅ Can see: Vehicles, Drivers, Trips, Maintenance, Dashboard
 3. ❌ Cannot see: Reports (403), cannot create Vehicles or Drivers
+
 4. Log out → Log in as **Maintenance Manager** (`maintenance@kurachel.com` / `maintpassword123`)
 5. ✅ Can see: Maintenance, Reports, Dashboard
 6. ❌ Cannot see: Vehicles page, Drivers page, Trips (all 403)

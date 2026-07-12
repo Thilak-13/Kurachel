@@ -1,4 +1,4 @@
-// Shared Enums for TransitOps - Single Source of Truth
+// Shared enums for Kurachel - single source of truth
 // Exported with Object.freeze to prevent mutation.
 
 const VehicleStatus = Object.freeze({
