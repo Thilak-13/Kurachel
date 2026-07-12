@@ -39,8 +39,8 @@ function isValidStatusEnum(entity, value) {
  * @returns {boolean}
  */
 function isVehicleAvailableForDispatch(vehicle) {
-  // Stub body - to be implemented in Block 3
-  return true;
+  if (!vehicle) return false;
+  return vehicle.status === 'Available' || vehicle.status === 'ACTIVE';
 }
 
 /**
@@ -49,8 +49,8 @@ function isVehicleAvailableForDispatch(vehicle) {
  * @returns {boolean}
  */
 function isDriverAvailableForDispatch(driver) {
-  // Stub body - to be implemented in Block 3
-  return true;
+  if (!driver) return false;
+  return driver.status === 'Available' || driver.status === 'AVAILABLE';
 }
 
 /**
@@ -59,8 +59,11 @@ function isDriverAvailableForDispatch(driver) {
  * @returns {boolean}
  */
 function isLicenseValid(driver) {
-  // Stub body - to be implemented in Block 3
-  return true;
+  if (!driver) return false;
+  const today = new Date().toISOString().split('T')[0];
+  const isNotExpired = driver.licenseExpiryDate ? driver.licenseExpiryDate > today : false;
+  const isNotSuspended = driver.status !== 'Suspended' && driver.status !== 'INACTIVE';
+  return isNotExpired && isNotSuspended;
 }
 
 /**
@@ -70,8 +73,9 @@ function isLicenseValid(driver) {
  * @returns {boolean}
  */
 function isCargoWithinCapacity(cargoWeight, vehicle) {
-  // Stub body - to be implemented in Block 3
-  return true;
+  if (!vehicle) return false;
+  if (vehicle.maxLoadCapacity === undefined || vehicle.maxLoadCapacity === null) return true;
+  return Number(cargoWeight) <= Number(vehicle.maxLoadCapacity);
 }
 
 module.exports = {

@@ -1,21 +1,23 @@
 import express from 'express';
+import { verifyToken } from '../middlewares/auth.middleware.js';
+import { requirePermission } from '../middlewares/rbac.middleware.js';
+import * as controller from '../controllers/trip.controller.js';
+
 const router = express.Router();
 
-// Placeholder for Trip CRUD and Dispatch operations
-router.get('/', (req, res) => {
-  res.json({ message: 'GET /api/trips - Retrieve all trips (placeholder)' });
-});
+// GET /api/trips
+router.get('/', verifyToken, requirePermission('trip:view'), controller.getTrips);
 
-router.post('/', (req, res) => {
-  res.json({ message: 'POST /api/trips - Dispatch new trip (placeholder)' });
-});
+// POST /api/trips
+router.post('/', verifyToken, requirePermission('trip:create'), controller.createTrip);
 
-router.put('/:id', (req, res) => {
-  res.json({ message: `PUT /api/trips/${req.params.id} - Update trip status/info (placeholder)` });
-});
+// POST /api/trips/:id/dispatch
+router.post('/:id/dispatch', verifyToken, requirePermission('trip:dispatch'), controller.dispatchTrip);
 
-router.delete('/:id', (req, res) => {
-  res.json({ message: `DELETE /api/trips/${req.params.id} - Cancel/Delete trip (placeholder)` });
-});
+// POST /api/trips/:id/complete
+router.post('/:id/complete', verifyToken, requirePermission('trip:complete'), controller.completeTrip);
+
+// POST /api/trips/:id/cancel
+router.post('/:id/cancel', verifyToken, requirePermission('trip:cancel'), controller.cancelTrip);
 
 export default router;

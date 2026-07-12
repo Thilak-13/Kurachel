@@ -7,7 +7,6 @@ const { VehicleStatus } = require('../enums');
  * @returns {boolean}
  */
 function canOpenMaintenance(vehicle) {
-  // Stub body - to be implemented in Block 2/3
   return true;
 }
 
@@ -17,10 +16,8 @@ function canOpenMaintenance(vehicle) {
  * @returns {boolean}
  */
 function canCloseMaintenance(vehicle) {
-  // Stub body - to be implemented in Block 2/3
-  // NOTE: This function must eventually respect a "Retired vehicles stay Retired" guard.
-  // If vehicle.status === VehicleStatus.RETIRED (or 'Retired'), it should remain Retired.
-  return true;
+  if (!vehicle) return false;
+  return vehicle.status !== 'Retired' && vehicle.status !== 'DECOMMISSIONED';
 }
 
 module.exports = {
