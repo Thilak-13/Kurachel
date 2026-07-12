@@ -1,6 +1,6 @@
 # RBAC Bug Bash Report
 
-Run: 2026-07-12T10:17:39.994Z
+Run: 2026-07-12T10:21:01.961Z
 
 | Role | Action | Expected | Actual | Result |
 |---|---|---|---|---|
