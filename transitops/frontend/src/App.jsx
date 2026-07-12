@@ -1,6 +1,13 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './components/MainLayout';
+import {
+  isAuthenticated as hasToken,
+  getStoredUser,
+  fetchProfile,
+  clearSession,
+  onUnauthorized,
+} from './services/apiClient';
 
 // ── Lazy-loaded pages ─────────────────────────────
 const Dashboard   = lazy(() => import('./pages/Dashboard'));
@@ -29,6 +36,7 @@ function ProtectedRoute({ isAuthenticated, user, allowedRoles, children }) {
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
+  // Role checks use the server-returned role only (see App state below).
   if (allowedRoles && !allowedRoles.includes(user?.role)) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -36,30 +44,55 @@ function ProtectedRoute({ isAuthenticated, user, allowedRoles, children }) {
 }
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('transitops_auth') === 'true';
-  });
-  
-  const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('transitops_user');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        return { username: 'admin_user', role: 'Admin', email: 'admin@kurachel.com' };
-      }
-    }
-    return { username: 'admin_user', role: 'Admin', email: 'admin@kurachel.com' };
-  });
+  // Session is restored ONLY when a real JWT exists. The user object is loaded
+  // from stored login data and later re-verified against the backend.
+  const [isAuthenticated, setIsAuthenticated] = useState(() => hasToken());
+  const [user, setUser] = useState(() => (hasToken() ? getStoredUser() : null));
 
+  // Verify the stored session against the backend on startup. If the token is
+  // missing or rejected, drop the session. The server-returned role is the
+  // source of truth, so a user cannot become Admin by editing local storage.
   useEffect(() => {
-    localStorage.setItem('transitops_auth', isAuthenticated);
-    if (user) {
-      localStorage.setItem('transitops_user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('transitops_user');
+    let cancelled = false;
+
+    if (!hasToken()) {
+      clearSession();
+      setIsAuthenticated(false);
+      setUser(null);
+      return;
     }
-  }, [isAuthenticated, user]);
+
+    fetchProfile()
+      .then((profileUser) => {
+        if (cancelled) return;
+        setUser(profileUser);
+        setIsAuthenticated(true);
+      })
+      .catch(() => {
+        // 401/invalid token clears the session inside the API client; make sure
+        // React state follows for anything else (network errors keep session).
+        if (cancelled) return;
+        if (!hasToken()) {
+          setIsAuthenticated(false);
+          setUser(null);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // If any authenticated API call comes back unauthenticated, drop the session
+  // and send the user back to login.
+  useEffect(() => {
+    onUnauthorized(() => {
+      clearSession();
+      setIsAuthenticated(false);
+      setUser(null);
+    });
+    return () => onUnauthorized(null);
+  }, []);
 
   // Shared layout wrapper
   const withLayout = (Component, allowedRoles) => (
@@ -89,15 +122,15 @@ function App() {
           }
         />
 
-        {/* Protected */}
+        {/* Protected — allowedRoles use the backend role names. */}
         <Route path="/dashboard"   element={withLayout(Dashboard)} />
         <Route path="/vehicles"    element={withLayout(Vehicles)} />
-        <Route path="/drivers"     element={withLayout(Drivers,     ['Admin', 'Fleet Manager', 'Dispatcher'])} />
-        <Route path="/trips"       element={withLayout(Trips,       ['Admin', 'Dispatcher'])} />
-        <Route path="/maintenance" element={withLayout(Maintenance, ['Admin', 'Dispatcher', 'Maintenance Manager'])} />
-        <Route path="/fuel"        element={withLayout(FuelLogs,    ['Admin', 'Fleet Manager', 'Dispatcher', 'Maintenance Manager'])} />
-        <Route path="/expenses"    element={withLayout(Expenses,    ['Admin', 'Fleet Manager', 'Dispatcher'])} />
-        <Route path="/reports"     element={withLayout(Reports,     ['Admin', 'Fleet Manager', 'Maintenance Manager'])} />
+        <Route path="/drivers"     element={withLayout(Drivers,     ['ADMIN', 'FLEET_MANAGER', 'DISPATCHER'])} />
+        <Route path="/trips"       element={withLayout(Trips,       ['ADMIN', 'DISPATCHER'])} />
+        <Route path="/maintenance" element={withLayout(Maintenance, ['ADMIN', 'DISPATCHER', 'MAINTENANCE_MANAGER'])} />
+        <Route path="/fuel"        element={withLayout(FuelLogs,    ['ADMIN', 'FLEET_MANAGER', 'DISPATCHER', 'MAINTENANCE_MANAGER'])} />
+        <Route path="/expenses"    element={withLayout(Expenses,    ['ADMIN', 'FLEET_MANAGER', 'DISPATCHER'])} />
+        <Route path="/reports"     element={withLayout(Reports,     ['ADMIN', 'FLEET_MANAGER', 'MAINTENANCE_MANAGER'])} />
 
         {/* Catch-all */}
         <Route path="*" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} />

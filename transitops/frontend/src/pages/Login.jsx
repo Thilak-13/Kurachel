@@ -1,30 +1,39 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { Shield, Eye, EyeOff, Lock, User } from 'lucide-react';
+import { login as loginRequest } from '../services/apiClient';
 
 export default function Login({ setUser, setIsAuthenticated }) {
-  const [email, setEmail] = useState('admin@kurachel.com');
-  const [password, setPassword] = useState('password123');
-  const [role, setRole] = useState('Admin');
+  const [loginIdentifier, setLoginIdentifier] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
-      setError('Please fill in all fields.');
+    if (isSubmitting) return; // prevent repeated submission
+
+    if (!loginIdentifier || !password) {
+      setError('Please enter your email/username and password.');
       return;
     }
-    
-    // Simulate API login
-    setIsAuthenticated(true);
-    setUser({
-      username: `${role.toLowerCase().replace(' ', '_')}_user`,
-      role: role,
-      email: email
-    });
-    navigate('/dashboard');
+
+    setError('');
+    setIsSubmitting(true);
+    try {
+      const { user } = await loginRequest(loginIdentifier.trim(), password);
+      // Token + user are already persisted by the API client.
+      setUser(user);
+      setIsAuthenticated(true);
+      navigate('/dashboard', { replace: true });
+    } catch (err) {
+      // Show the backend-provided message (e.g. invalid email/username or
+      // incorrect password) and stay on the login page.
+      setError(err?.message || 'Login failed. Please try again.');
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -43,34 +52,39 @@ export default function Login({ setUser, setIsAuthenticated }) {
           </h2>
         </div>
         <p className="mt-3 text-center text-sm text-slate-400">
-          Enter credentials or pick a demo role to access the operations portal
+          Sign in with your credentials to access the operations portal
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md z-10">
         <div className="bg-slate-800/50 backdrop-blur-md py-8 px-4 shadow-2xl rounded-2xl border border-slate-700/50 sm:px-10">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
             {error && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-lg">
+              <div
+                role="alert"
+                className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-lg"
+              >
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-300">
-                Email Address
+              <label htmlFor="loginIdentifier" className="block text-sm font-medium text-slate-300">
+                Email or Username
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
-                  <Mail className="w-4 h-4" />
+                  <User className="w-4 h-4" />
                 </div>
                 <input
-                  id="email"
-                  type="email"
+                  id="loginIdentifier"
+                  type="text"
+                  autoComplete="username"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
+                  value={loginIdentifier}
+                  onChange={(e) => setLoginIdentifier(e.target.value)}
+                  disabled={isSubmitting}
+                  className="block w-full pl-10 pr-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all disabled:opacity-60"
                   placeholder="name@company.com"
                 />
               </div>
@@ -87,10 +101,12 @@ export default function Login({ setUser, setIsAuthenticated }) {
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-10 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
+                  disabled={isSubmitting}
+                  className="block w-full pl-10 pr-10 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all disabled:opacity-60"
                   placeholder="••••••••"
                 />
                 <button
@@ -104,28 +120,15 @@ export default function Login({ setUser, setIsAuthenticated }) {
             </div>
 
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-slate-300">
-                Sign in as Role
-              </label>
-              <select
-                id="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="mt-1 block w-full py-2.5 px-3 bg-slate-900 border border-slate-700 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
-              >
-                <option value="Admin">Admin</option>
-                <option value="Fleet Manager">Fleet Manager</option>
-                <option value="Dispatcher">Dispatcher</option>
-                <option value="Maintenance Manager">Maintenance Manager</option>
-              </select>
-            </div>
-
-            <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-blue-500 transition-all transform active:scale-95"
+                disabled={isSubmitting}
+                className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-blue-500 transition-all transform active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100"
               >
-                Sign In
+                {isSubmitting && (
+                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                )}
+                {isSubmitting ? 'Signing In...' : 'Sign In'}
               </button>
             </div>
           </form>

@@ -16,17 +16,28 @@ import {
   Fuel,
   DollarSign
 } from 'lucide-react';
+import { logout as clearAuthSession } from '../services/apiClient';
 
+// Roles use the backend role names (the server-returned role is authoritative).
 const navigationItems = [
-  { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['Admin', 'Fleet Manager', 'Dispatcher', 'Maintenance Manager'] },
-  { name: 'Vehicles', path: '/vehicles', icon: Truck, roles: ['Admin', 'Fleet Manager', 'Dispatcher', 'Maintenance Manager'] },
-  { name: 'Drivers', path: '/drivers', icon: Users, roles: ['Admin', 'Fleet Manager', 'Dispatcher'] },
-  { name: 'Trips', path: '/trips', icon: Route, roles: ['Admin', 'Dispatcher'] },
-  { name: 'Maintenance', path: '/maintenance', icon: Wrench, roles: ['Admin', 'Dispatcher', 'Maintenance Manager'] },
-  { name: 'Fuel Logs', path: '/fuel', icon: Fuel, roles: ['Admin', 'Fleet Manager', 'Dispatcher', 'Maintenance Manager'] },
-  { name: 'Expenses', path: '/expenses', icon: DollarSign, roles: ['Admin', 'Fleet Manager', 'Dispatcher'] },
-  { name: 'Reports', path: '/reports', icon: FileText, roles: ['Admin', 'Fleet Manager', 'Maintenance Manager'] },
+  { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['ADMIN', 'FLEET_MANAGER', 'DISPATCHER', 'MAINTENANCE_MANAGER'] },
+  { name: 'Vehicles', path: '/vehicles', icon: Truck, roles: ['ADMIN', 'FLEET_MANAGER', 'DISPATCHER', 'MAINTENANCE_MANAGER'] },
+  { name: 'Drivers', path: '/drivers', icon: Users, roles: ['ADMIN', 'FLEET_MANAGER', 'DISPATCHER'] },
+  { name: 'Trips', path: '/trips', icon: Route, roles: ['ADMIN', 'DISPATCHER'] },
+  { name: 'Maintenance', path: '/maintenance', icon: Wrench, roles: ['ADMIN', 'DISPATCHER', 'MAINTENANCE_MANAGER'] },
+  { name: 'Fuel Logs', path: '/fuel', icon: Fuel, roles: ['ADMIN', 'FLEET_MANAGER', 'DISPATCHER', 'MAINTENANCE_MANAGER'] },
+  { name: 'Expenses', path: '/expenses', icon: DollarSign, roles: ['ADMIN', 'FLEET_MANAGER', 'DISPATCHER'] },
+  { name: 'Reports', path: '/reports', icon: FileText, roles: ['ADMIN', 'FLEET_MANAGER', 'MAINTENANCE_MANAGER'] },
 ];
+
+// Turn a backend role name (e.g. 'FLEET_MANAGER') into a display label.
+function formatRole(role) {
+  if (!role) return '';
+  return role
+    .split('_')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+}
 
 export default function MainLayout({ children, user, setUser, setIsAuthenticated }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -35,23 +46,15 @@ export default function MainLayout({ children, user, setUser, setIsAuthenticated
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    clearAuthSession(); // clears kurachel_token + kurachel_user
     setIsAuthenticated(false);
     setUser(null);
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
-  const handleRoleChange = (e) => {
-    const newRole = e.target.value;
-    setUser({
-      ...user,
-      role: newRole,
-      username: `${newRole.toLowerCase().replace(' ', '_')}_user`
-    });
-  };
-
-  // Filter navigation items based on user's role
-  const filteredNavItems = navigationItems.filter(item => 
-    item.roles.includes(user?.role || 'Admin')
+  // Filter navigation items based on the server-returned role.
+  const filteredNavItems = navigationItems.filter(item =>
+    item.roles.includes(user?.role)
   );
 
   const getPageTitle = () => {
@@ -119,7 +122,7 @@ export default function MainLayout({ children, user, setUser, setIsAuthenticated
             {!isCollapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold truncate">{user?.username || 'User'}</p>
-                <p className="text-xs text-blue-400 truncate">{user?.role || 'Admin'}</p>
+                <p className="text-xs text-blue-400 truncate">{formatRole(user?.role)}</p>
               </div>
             )}
             {!isCollapsed && (
@@ -192,7 +195,7 @@ export default function MainLayout({ children, user, setUser, setIsAuthenticated
               </div>
               <div>
                 <p className="text-sm font-semibold truncate">{user?.username || 'User'}</p>
-                <p className="text-xs text-blue-400 truncate">{user?.role || 'Admin'}</p>
+                <p className="text-xs text-blue-400 truncate">{formatRole(user?.role)}</p>
               </div>
             </div>
             <button 
@@ -220,22 +223,6 @@ export default function MainLayout({ children, user, setUser, setIsAuthenticated
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Debugging Role Switcher */}
-            <div className="flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-lg px-2.5 py-1.5">
-              <Shield className="w-4 h-4 text-blue-600" />
-              <label className="text-xs font-semibold text-blue-700 hidden sm:inline-block">Simulated Role:</label>
-              <select
-                value={user?.role || 'Admin'}
-                onChange={handleRoleChange}
-                className="bg-transparent text-xs font-bold text-blue-800 border-none outline-none cursor-pointer focus:ring-0"
-              >
-                <option value="Admin">Admin</option>
-                <option value="Fleet Manager">Fleet Manager</option>
-                <option value="Dispatcher">Dispatcher</option>
-                <option value="Maintenance Manager">Maintenance Manager</option>
-              </select>
-            </div>
-
             {/* Profile Dropdown Placeholder */}
             <div className="flex items-center gap-3">
               <div className="hidden md:flex flex-col text-right">
