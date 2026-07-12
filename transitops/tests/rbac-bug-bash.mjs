@@ -5,19 +5,19 @@ const PORT = process.env.PORT || 5000;
 const BASE_URL = `http://localhost:${PORT}/api`;
 
 const ACCOUNTS = [
-  { label: 'Admin',               email: 'admin@transitops.com',       password: 'adminpassword123' },
-  { label: 'Fleet Manager',       email: 'fleet@transitops.com',        password: 'fleetpassword123' },
-  { label: 'Dispatcher',          email: 'dispatcher@transitops.com',   password: 'dispatchpassword123' },
-  { label: 'Maintenance Manager', email: 'maintenance@transitops.com',  password: 'maintpassword123' },
-  { label: 'Driver',              email: 'john.doe@transitops.com',     password: 'driverpassword123' },
+  { label: 'Admin',               email: 'admin@kurachel.com',       password: 'adminpassword123' },
+  { label: 'Fleet Manager',       email: 'fleet@kurachel.com',        password: 'fleetpassword123' },
+  { label: 'Dispatcher',          email: 'dispatcher@kurachel.com',   password: 'dispatchpassword123' },
+  { label: 'Maintenance Manager', email: 'maintenance@kurachel.com',  password: 'maintpassword123' },
+  { label: 'Driver',              email: 'john.doe@kurachel.com',     password: 'driverpassword123' },
 ];
 
 // Actions to verify — [method, path, body, description, expectedForRole (fn)]
 const PROBES = [
-  { method: 'POST', path: '/vehicles', body: { registrationNumber: `RB-${Date.now()}`, model: 'Test', type: 'Van', maxLoadCapacity: 1000, odometer: 0, acquisitionCost: 10000, status: 'Available' }, label: 'Create Vehicle', allowed: ['Admin', 'Fleet Manager'] },
+  { method: 'POST', path: '/vehicles', body: { registrationNumber: `MH-12-RB-${1000 + Math.floor(Math.random() * 9000)}`, model: 'Test', type: 'Van', maxLoadCapacity: 1000, odometer: 0, acquisitionCost: 10000, status: 'Available' }, label: 'Create Vehicle', allowed: ['Admin', 'Fleet Manager'] },
   { method: 'GET',  path: '/vehicles', body: null, label: 'View Vehicles', allowed: ['Admin', 'Fleet Manager', 'Dispatcher', 'Driver'] },
   { method: 'GET',  path: '/drivers',  body: null, label: 'View Drivers',  allowed: ['Admin', 'Fleet Manager', 'Dispatcher'] },
-  { method: 'POST', path: '/drivers',  body: { name: 'RBAC Tester', licenseNumber: `DL-RB-${Date.now()}`, licenseExpiryDate: '2030-01-01', contact: '9999999999' }, label: 'Create Driver',  allowed: ['Admin', 'Fleet Manager'] },
+  { method: 'POST', path: '/drivers',  body: { name: 'RBAC Tester', licenseNumber: `DL14 ${40000000000 + Math.floor(Math.random() * 9000000000)}`, licenseExpiryDate: '2030-01-01', contact: `+91-${9000000000 + Math.floor(Math.random() * 1000000000)}` }, label: 'Create Driver',  allowed: ['Admin', 'Fleet Manager'] },
   { method: 'GET',  path: '/trips',    body: null, label: 'View Trips',   allowed: ['Admin', 'Dispatcher', 'Driver'] },
   { method: 'GET',  path: '/maintenance', body: null, label: 'View Maintenance', allowed: ['Admin', 'Dispatcher', 'Maintenance Manager'] },
   { method: 'GET',  path: '/reports/operational', body: null, label: 'View Reports', allowed: ['Admin', 'Fleet Manager', 'Maintenance Manager'] },

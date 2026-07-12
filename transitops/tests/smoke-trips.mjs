@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 5000;
 const BASE_URL = `http://localhost:${PORT}/api`;
 
-const adminCreds = { email: 'admin@transitops.com', password: 'adminpassword123' };
+const adminCreds = { email: 'admin@kurachel.com', password: 'adminpassword123' };
 
 async function run() {
   console.log('=== STARTING TRIP REJECTION AND RACE CONDITION TESTS ===');

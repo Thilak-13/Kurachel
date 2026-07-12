@@ -44,6 +44,8 @@ export const getDrivers = async (query) => {
     const dbStatus = apiToDbDriverStatus[status];
     if (dbStatus) {
       where.status = dbStatus;
+    } else {
+      throw new ApiError(400, `Invalid driver status filter. Must be one of: ${Object.keys(apiToDbDriverStatus).join(', ')}`);
     }
   }
 

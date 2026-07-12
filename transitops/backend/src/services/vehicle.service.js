@@ -45,6 +45,8 @@ export const getVehicles = async (query) => {
     const dbStatus = apiToDbVehicleStatus[status];
     if (dbStatus) {
       where.status = dbStatus;
+    } else {
+      throw new ApiError(400, `Invalid vehicle status filter. Must be one of: ${Object.keys(apiToDbVehicleStatus).join(', ')}`);
     }
   }
 

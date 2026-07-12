@@ -26,7 +26,7 @@ Open `http://localhost:5173` in a browser.
 
 1. Open `http://localhost:5173`
 2. Enter credentials:
-   - **Email:** `admin@transitops.com`
+   - **Email:** `admin@kurachel.com`
    - **Password:** `adminpassword123`
 3. Click **Sign In**
 4. ✅ You land on the **Dashboard** — observe live KPIs: Active Vehicles, Available Drivers, Active Trips, Fleet Utilization %
@@ -149,11 +149,10 @@ curl -X PUT http://localhost:5000/api/drivers/{driverId} \
 
 ## Step 8 — RBAC Demo (Bonus — 2 minutes)
 
-1. Log out → Log in as **Dispatcher** (`dispatcher@transitops.com` / `dispatchpassword123`)
+1. Log out → Log in as **Dispatcher** (`dispatcher@kurachel.com` / `dispatchpassword123`)
 2. ✅ Can see: Vehicles, Drivers, Trips, Maintenance, Dashboard
 3. ❌ Cannot see: Reports (403), cannot create Vehicles or Drivers
-
-4. Log out → Log in as **Maintenance Manager** (`maintenance@transitops.com` / `maintpassword123`)
+4. Log out → Log in as **Maintenance Manager** (`maintenance@kurachel.com` / `maintpassword123`)
 5. ✅ Can see: Maintenance, Reports, Dashboard
 6. ❌ Cannot see: Vehicles page, Drivers page, Trips (all 403)
 

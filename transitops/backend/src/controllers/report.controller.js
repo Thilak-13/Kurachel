@@ -40,7 +40,7 @@ export const exportReportsCsv = async (req, res, next) => {
     const csvContent = await reportService.generateReportsCsv(req.query);
 
     res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename=transitops-operational-report.csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=kurachel-operational-report.csv');
     
     return res.status(200).send(csvContent);
   } catch (error) {
