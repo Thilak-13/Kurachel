@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 
 const VEHICLE_TYPES = ['Van', 'Box Truck', 'Flatbed', 'Sedan', 'Trailer'];
 const VEHICLE_STATUSES = ['Available', 'On Trip', 'In Shop', 'Retired'];
+const REGISTRATION_NUMBER_PATTERN = /^[A-Z]{2}-\d{1,2}[A-Z]{0,2}-[A-Z]{1,2}-\d{4}$/;
 
 export default function VehicleForm({ isOpen, onClose, onSubmit, vehicle }) {
   const [formData, setFormData] = useState({
@@ -56,6 +57,8 @@ export default function VehicleForm({ isOpen, onClose, onSubmit, vehicle }) {
 
     if (!formData.registrationNumber.trim()) {
       newErrors.registrationNumber = 'Registration Number is required';
+    } else if (!REGISTRATION_NUMBER_PATTERN.test(formData.registrationNumber.trim())) {
+      newErrors.registrationNumber = 'Format: MH-12-AB-3456 or DL-3C-AB-1234';
     }
 
     if (!formData.model.trim()) {
@@ -150,7 +153,7 @@ export default function VehicleForm({ isOpen, onClose, onSubmit, vehicle }) {
                 name="registrationNumber"
                 value={formData.registrationNumber}
                 onChange={handleChange}
-                placeholder="e.g. TX-1234"
+                placeholder="e.g. MH-12-AB-3456"
                 className={`w-full px-3.5 py-2.5 text-sm bg-slate-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                   errors.registrationNumber ? 'border-red-300 focus:ring-red-500' : 'border-slate-200'
                 }`}
@@ -169,7 +172,7 @@ export default function VehicleForm({ isOpen, onClose, onSubmit, vehicle }) {
                 name="model"
                 value={formData.model}
                 onChange={handleChange}
-                placeholder="e.g. Ford Transit 350"
+                placeholder="e.g. Tata Ultra 1412"
                 className={`w-full px-3.5 py-2.5 text-sm bg-slate-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                   errors.model ? 'border-red-300 focus:ring-red-500' : 'border-slate-200'
                 }`}
@@ -216,7 +219,7 @@ export default function VehicleForm({ isOpen, onClose, onSubmit, vehicle }) {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  Max Load (lbs) *
+                  Max Load (kg) *
                 </label>
                 <input
                   type="number"
@@ -235,7 +238,7 @@ export default function VehicleForm({ isOpen, onClose, onSubmit, vehicle }) {
 
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  Odometer (mi) *
+                  Odometer (km) *
                 </label>
                 <input
                   type="number"
@@ -254,14 +257,14 @@ export default function VehicleForm({ isOpen, onClose, onSubmit, vehicle }) {
 
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  Cost ($USD) *
+                  Cost (₹ INR) *
                 </label>
                 <input
                   type="number"
                   name="acquisitionCost"
                   value={formData.acquisitionCost}
                   onChange={handleChange}
-                  placeholder="e.g. 32000"
+                  placeholder="e.g. 1850000"
                   className={`w-full px-3.5 py-2.5 text-sm bg-slate-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                     errors.acquisitionCost ? 'border-red-300 focus:ring-red-500' : 'border-slate-200'
                   }`}

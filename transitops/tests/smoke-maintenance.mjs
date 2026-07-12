@@ -81,7 +81,7 @@ async function run() {
         licenseNumber: licenseNo,
         category: 'Class A',
         licenseExpiryDate: '2030-01-01',
-        contact: '555-9090',
+        contact: '9999999999',
         safetyScore: 95,
         status: 'Available'
       })
@@ -94,7 +94,13 @@ async function run() {
     const tripRes = await fetch(`${BASE_URL}/trips`, {
       method: 'POST',
       headers: getHeaders(),
-      body: JSON.stringify({ vehicleId, driverId, routeName: 'Emergency route', cargoWeight: 200 })
+      body: JSON.stringify({
+        vehicleId,
+        driverId,
+        startLocation: 'Mumbai',
+        endLocation: 'Pune',
+        cargoWeight: 200
+      })
     });
     const trip = await tripRes.json();
     await fetch(`${BASE_URL}/trips/${trip.id}/dispatch`, { method: 'POST', headers: getHeaders() });

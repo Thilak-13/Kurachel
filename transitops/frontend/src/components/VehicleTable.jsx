@@ -14,9 +14,9 @@ export default function VehicleTable({ vehicles, onEdit, onDelete, userRole }) {
             <th className="py-3.5 px-6">Registration Number</th>
             <th className="py-3.5 px-6">Model</th>
             <th className="py-3.5 px-6">Type</th>
-            <th className="py-3.5 px-6">Max Load (lbs)</th>
+            <th className="py-3.5 px-6">Max Load (kg)</th>
             <th className="py-3.5 px-6">Odometer</th>
-            <th className="py-3.5 px-6">Acquisition Cost</th>
+            <th className="py-3.5 px-6">Acquisition Cost (₹)</th>
             <th className="py-3.5 px-6">Status</th>
             {isEditable && <th className="py-3.5 px-6 text-right">Actions</th>}
           </tr>
@@ -27,9 +27,9 @@ export default function VehicleTable({ vehicles, onEdit, onDelete, userRole }) {
               <td className="py-4 px-6 font-bold text-slate-900">{vehicle.registrationNumber}</td>
               <td className="py-4 px-6 text-slate-600">{vehicle.model}</td>
               <td className="py-4 px-6">{vehicle.type}</td>
-              <td className="py-4 px-6">{Number(vehicle.maxLoadCapacity).toLocaleString()}</td>
-              <td className="py-4 px-6">{Number(vehicle.odometer).toLocaleString()} mi</td>
-              <td className="py-4 px-6">${Number(vehicle.acquisitionCost).toLocaleString()}</td>
+              <td className="py-4 px-6">{Number(vehicle.maxLoadCapacity).toLocaleString('en-IN')} kg</td>
+              <td className="py-4 px-6">{Number(vehicle.odometer).toLocaleString('en-IN')} km</td>
+              <td className="py-4 px-6">₹{Number(vehicle.acquisitionCost).toLocaleString('en-IN')}</td>
               <td className="py-4 px-6">
                 <StatusBadge status={vehicle.status} />
               </td>

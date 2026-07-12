@@ -211,14 +211,14 @@ export default function FuelLogs({ user }) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  Quantity (gal) *
+                  Quantity (L) *
                 </label>
                 <input
                   type="number"
                   name="quantity"
                   value={formData.quantity}
                   onChange={handleChange}
-                  placeholder="e.g. 15"
+                  placeholder="e.g. 45"
                   step="0.01"
                   className={`w-full px-3 py-2 text-sm bg-slate-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                     formErrors.quantity ? 'border-red-300 focus:ring-red-500' : 'border-slate-200'
@@ -229,7 +229,7 @@ export default function FuelLogs({ user }) {
 
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  Total Cost ($) *
+                  Total Cost (₹) *
                 </label>
                 <input
                   type="number"
@@ -255,7 +255,7 @@ export default function FuelLogs({ user }) {
                 name="station"
                 value={formData.station}
                 onChange={handleChange}
-                placeholder="e.g. Texaco Austin"
+                placeholder="e.g. HPCL Chennai Bypass"
                 className={`w-full px-3 py-2 text-sm bg-slate-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                   formErrors.station ? 'border-red-300 focus:ring-red-500' : 'border-slate-200'
                 }`}
@@ -340,8 +340,8 @@ export default function FuelLogs({ user }) {
                     <tr>
                       <th className="py-3 px-4">Vehicle</th>
                       <th className="py-3 px-4">Trip</th>
-                      <th className="py-3 px-4">Quantity (gal)</th>
-                      <th className="py-3 px-4">Cost ($)</th>
+                      <th className="py-3 px-4">Quantity (L)</th>
+                      <th className="py-3 px-4">Cost (₹)</th>
                       <th className="py-3 px-4">Fuel Station</th>
                       <th className="py-3 px-4">Refuel Date</th>
                     </tr>
@@ -353,8 +353,8 @@ export default function FuelLogs({ user }) {
                         <td className="py-3 px-4 text-xs text-slate-500 truncate max-w-[150px]" title={getTripLabel(log.tripId)}>
                           {getTripLabel(log.tripId)}
                         </td>
-                        <td className="py-3 px-4">{log.quantity} gal</td>
-                        <td className="py-3 px-4 font-bold text-slate-900">${Number(log.cost).toFixed(2)}</td>
+                        <td className="py-3 px-4">{log.quantity} L</td>
+                        <td className="py-3 px-4 font-bold text-slate-900">₹{Number(log.cost).toLocaleString('en-IN')}</td>
                         <td className="py-3 px-4">{log.station}</td>
                         <td className="py-3 px-4 text-slate-600 text-xs">{log.date}</td>
                       </tr>
