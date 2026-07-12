@@ -287,6 +287,7 @@ async function main() {
       description: 'Full engine overhaul, cylinder head machining, and new clutch plate kit installation at authorized service center.',
       cost: 24500.00,
       performedAt: new Date('2026-07-08T10:00:00Z'),
+      status: 'CLOSED',
     },
   });
 
@@ -296,6 +297,7 @@ async function main() {
       description: 'First 20,000 km general service: Engine oil change, air and oil filter replacement, brake cleaning, and wheel alignment.',
       cost: 8500.00,
       performedAt: new Date('2026-07-11T09:30:00Z'),
+      status: 'CLOSED',
     },
   });
 

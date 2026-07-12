@@ -16,7 +16,7 @@ const mapLogToApi = (l) => {
     desc = parts.slice(1).join(':').trim();
   }
 
-  const isClosed = l.cost > 0 || l.performedAt > l.createdAt;
+  const isClosed = l.status === 'CLOSED';
 
   return {
     id: l.id,
@@ -24,7 +24,7 @@ const mapLogToApi = (l) => {
     type,
     description: desc,
     cost: l.cost,
-    status: l.vehicle && l.vehicle.status === 'OUT_OF_SERVICE' ? 'In Shop' : 'Completed',
+    status: l.status === 'OPEN' ? 'In Shop' : 'Completed',
     dateOpened: l.createdAt,
     dateClosed: isClosed ? l.performedAt : null,
     vehicle: l.vehicle ? {
@@ -69,7 +69,8 @@ export const openMaintenance = async (data) => {
         vehicleId,
         description: formattedDesc,
         cost: 0.0,
-        performedAt: new Date()
+        performedAt: new Date(),
+        status: 'OPEN'
       },
       include: { vehicle: true }
     });
@@ -111,7 +112,8 @@ export const closeMaintenance = async (id, data) => {
       where: { id },
       data: {
         cost: costVal,
-        performedAt: new Date()
+        performedAt: new Date(),
+        status: 'CLOSED'
       },
       include: { vehicle: true }
     });

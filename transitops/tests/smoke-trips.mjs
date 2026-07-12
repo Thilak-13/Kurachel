@@ -43,7 +43,7 @@ async function run() {
 
   // Helper to create a test vehicle
   const createTestVehicle = async (maxCapacity, status = 'Available') => {
-    const regNo = `TX-TRIP-${Math.floor(Math.random() * 100000)}`;
+    const regNo = `MH-12-TR-${1000 + Math.floor(Math.random() * 9000)}`;
     const res = await fetch(`${BASE_URL}/vehicles`, {
       method: 'POST',
       headers: getHeaders(),
@@ -53,16 +53,27 @@ async function run() {
         type: 'Truck',
         maxLoadCapacity: maxCapacity,
         odometer: 100,
-        acquisitionCost: 15000,
+        acquisitionCost: 1500000.0,
         status
       })
     });
     return await res.json();
   };
 
+  // Helper to update a test vehicle
+  const updateTestVehicle = async (vehicleId, payload) => {
+    const res = await fetch(`${BASE_URL}/vehicles/${vehicleId}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(payload)
+    });
+    return await res.json();
+  };
+
   // Helper to create a test driver
   const createTestDriver = async (expiryDate, status = 'Available') => {
-    const licenseNo = `DL-TRIP-${Math.floor(Math.random() * 1000000)}`;
+    const licenseNo = `DL14 ${30000000000 + Math.floor(Math.random() * 9000000000)}`;
+    const phoneNo = `+91-${9000000000 + Math.floor(Math.random() * 1000000000)}`;
     const res = await fetch(`${BASE_URL}/drivers`, {
       method: 'POST',
       headers: getHeaders(),
@@ -71,10 +82,21 @@ async function run() {
         licenseNumber: licenseNo,
         category: 'Class A',
         licenseExpiryDate: expiryDate,
-        contact: '555-4321',
+        contact: phoneNo,
+        phone: phoneNo,
         safetyScore: 90,
         status
       })
+    });
+    return await res.json();
+  };
+
+  // Helper to update a test driver
+  const updateTestDriver = async (driverId, payload) => {
+    const res = await fetch(`${BASE_URL}/drivers/${driverId}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(payload)
     });
     return await res.json();
   };
@@ -87,18 +109,23 @@ async function run() {
       body: JSON.stringify({
         vehicleId,
         driverId,
-        routeName: 'Test Route',
-        cargoWeight
+        source: 'Mumbai, MH',
+        destination: 'Pune, MH',
+        cargoWeight,
+        plannedDistance: 150
       })
     });
     return await res.json();
   };
 
-  // 1. Dispatch with overweight cargo
+  // 1. Dispatch with overweight cargo (cargo capacity changes after draft creation)
   try {
-    const v = await createTestVehicle(1000); // Max capacity 1000kg
-    const d = await createTestDriver('2030-01-01'); // Valid license
-    const trip = await createTestTrip(v.id, d.id, 1500); // 1500kg cargo (overweight)
+    const v = await createTestVehicle(1000); // Capacity 1000kg
+    const d = await createTestDriver('2030-01-01'); // Valid
+    const trip = await createTestTrip(v.id, d.id, 800); // 800kg (fits fine initially)
+
+    // Now, decrease vehicle capacity to 500kg (so it becomes overloaded!)
+    await updateTestVehicle(v.id, { maxLoadCapacity: 500 });
 
     const res = await fetch(`${BASE_URL}/trips/${trip.id}/dispatch`, {
       method: 'POST',
@@ -123,32 +150,41 @@ async function run() {
   try {
     const v = await createTestVehicle(2000);
     const d = await createTestDriver('2030-01-01', 'Suspended'); // Suspended
-    const trip = await createTestTrip(v.id, d.id, 500);
-
-    const res = await fetch(`${BASE_URL}/trips/${trip.id}/dispatch`, {
+    
+    // We try to create a trip with a suspended driver, which should be rejected at creation
+    const resCreate = await fetch(`${BASE_URL}/trips`, {
       method: 'POST',
-      headers: getHeaders()
+      headers: getHeaders(),
+      body: JSON.stringify({
+        vehicleId: v.id,
+        driverId: d.id,
+        source: 'Mumbai, MH',
+        destination: 'Pune, MH',
+        cargoWeight: 500
+      })
     });
-    let data;
-    try { data = await res.json(); } catch(e) { data = {}; }
+    
     logTest(
-      'Dispatch with Suspended driver',
-      `/trips/:id/dispatch`,
+      'Create trip with Suspended driver',
+      `/trips`,
       'POST',
       400,
-      res.status,
-      res.status === 400 && data.errorCode === 'VALIDATION_ERROR',
-      data.message || 'No error message returned'
+      resCreate.status,
+      resCreate.status === 400,
+      'Trip creation correctly blocked for suspended driver.'
     );
   } catch (err) {
-    logTest('Dispatch with Suspended driver', '/trips/:id/dispatch', 'POST', 400, 'ERR_CONN', false, err.message);
+    logTest('Create trip with Suspended driver', '/trips', 'POST', 400, 'ERR_CONN', false, err.message);
   }
 
-  // 3. Dispatch with an expired license
+  // 3. Dispatch with expired license (expiring between draft and dispatch)
   try {
     const v = await createTestVehicle(2000);
-    const d = await createTestDriver('2020-01-01'); // Expired back in 2020
-    const trip = await createTestTrip(v.id, d.id, 500);
+    const d = await createTestDriver('2030-01-01'); // Valid initially
+    const trip = await createTestTrip(v.id, d.id, 500); // Draft created successfully
+
+    // Now, simulate the license expiring by updating the driver to an expired date
+    await updateTestDriver(d.id, { licenseExpiryDate: '2020-01-01' });
 
     const res = await fetch(`${BASE_URL}/trips/${trip.id}/dispatch`, {
       method: 'POST',

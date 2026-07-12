@@ -3,7 +3,7 @@ import { validateRequest } from '../middlewares/validation.middleware.js';
 
 /**
  * Validator rules for creating or updating a Driver.
- * Required fields are only enforced during creation (POST).
+ * Enforces strict format for license number and contact phone number.
  */
 export const driverValidator = [
   body('name')
@@ -15,8 +15,14 @@ export const driverValidator = [
   body('licenseNumber')
     .if((value, { req }) => req.method === 'POST')
     .trim()
-    .notEmpty().withMessage('License number is required')
-    .isLength({ min: 5, max: 25 }).withMessage('License number must be between 5 and 25 characters'),
+    .notEmpty().withMessage('License number is required'),
+
+  body('licenseNumber')
+    .optional({ checkFalsy: true })
+    .trim()
+    .isLength({ min: 5, max: 25 }).withMessage('License number must be between 5 and 25 characters')
+    .matches(/^[A-Z]{2}\d{2}\s?\d{11}$/)
+    .withMessage('License number must match Indian DL format, e.g. DL14 20180098765'),
 
   body('licenseExpiryDate')
     .if((value, { req }) => req.method === 'POST')
@@ -27,7 +33,16 @@ export const driverValidator = [
   body('contact')
     .optional({ checkFalsy: true })
     .trim()
-    .isLength({ min: 10, max: 15 }).withMessage('Contact/phone number must be between 10 and 15 digits'),
+    .isLength({ min: 10, max: 15 }).withMessage('Contact number must be between 10 and 15 digits')
+    .matches(/^\+91-?\d{10}$/)
+    .withMessage('Contact must be in +91-XXXXXXXXXX format'),
+
+  body('phone')
+    .optional({ checkFalsy: true })
+    .trim()
+    .isLength({ min: 10, max: 15 }).withMessage('Phone number must be between 10 and 15 digits')
+    .matches(/^\+91-?\d{10}$/)
+    .withMessage('Phone must be in +91-XXXXXXXXXX format'),
 
   body('category')
     .optional({ checkFalsy: true })

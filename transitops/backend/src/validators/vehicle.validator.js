@@ -3,14 +3,20 @@ import { validateRequest } from '../middlewares/validation.middleware.js';
 
 /**
  * Validator rules for creating or updating a Vehicle.
- * Uses conditional checks so that required fields are only enforced during POST requests.
+ * Enforces strict format for registration number.
  */
 export const vehicleValidator = [
   body('registrationNumber')
     .if((value, { req }) => req.method === 'POST')
     .trim()
-    .notEmpty().withMessage('Registration number is required')
-    .isLength({ min: 3, max: 20 }).withMessage('Registration number must be between 3 and 20 characters'),
+    .notEmpty().withMessage('Registration number is required'),
+
+  body('registrationNumber')
+    .optional({ checkFalsy: true })
+    .trim()
+    .isLength({ min: 3, max: 20 }).withMessage('Registration number must be between 3 and 20 characters')
+    .matches(/^[A-Z]{2}-\d{1,2}[A-Z]{0,2}-[A-Z]{1,2}-\d{4}$/)
+    .withMessage('Registration number must match Indian format, e.g. MH-12-AB-3456'),
 
   body('model')
     .if((value, { req }) => req.method === 'POST')

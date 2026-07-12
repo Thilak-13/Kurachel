@@ -33,6 +33,7 @@ const mapTripToApi = (t) => ({
   startTime: t.startTime || null,
   endTime: t.endTime || null,
   distance: t.distance || null,
+  cargoWeight: t.cargoWeight || null,
   createdAt: t.createdAt,
   updatedAt: t.updatedAt,
   vehicle: t.vehicle ? {
@@ -165,7 +166,8 @@ export const createTrip = async (data) => {
       status: 'SCHEDULED',
       startLocation: srcLoc,
       endLocation: destLoc,
-      distance: plannedDistance ? parseFloat(plannedDistance) : null
+      distance: plannedDistance ? parseFloat(plannedDistance) : null,
+      cargoWeight: cargoWeight ? parseFloat(cargoWeight) : null
     },
     include: {
       vehicle: true,
@@ -202,6 +204,11 @@ export const dispatchTrip = async (id) => {
     }
     if (trip.driver.status !== 'AVAILABLE') {
       throw new ApiError(400, `Driver is not available (Status: ${trip.driver.status})`);
+    }
+
+    validationService.validateLicenseNotExpired(trip.driver);
+    if (trip.cargoWeight) {
+      validationService.validateCargoWeightLimit(trip.cargoWeight, trip.vehicle);
     }
 
     // 3. Update simultaneously: vehicle status, driver status, trip status

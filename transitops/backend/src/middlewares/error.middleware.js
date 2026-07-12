@@ -22,11 +22,14 @@ export const errorHandler = (err, req, res, next) => {
     console.error(`[Error Handler] Message: ${message}`);
   }
 
+  // Default to VALIDATION_ERROR for all 400 Bad Requests unless a specific code is set
+  const resCode = errorCode || (statusCode === 400 ? 'VALIDATION_ERROR' : undefined);
+
   res.status(statusCode).json({
     success: false,
     message: message,
     errors: errors || [],
-    ...(errorCode && { errorCode })
+    ...(resCode && { errorCode: resCode })
   });
 };
 

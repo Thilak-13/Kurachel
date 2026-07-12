@@ -98,7 +98,7 @@ async function run() {
   // ==========================================
   console.log('\n--- Running Vehicle Tests ---');
   let testVehicleId = null;
-  const testRegNo = `TX-TEST-${Math.floor(Math.random() * 10000)}`;
+  const testRegNo = `MH-12-TX-${1000 + Math.floor(Math.random() * 9000)}`;
 
   // Test 1: GET (list)
   try {
@@ -180,7 +180,7 @@ async function run() {
   // Test 5: POST Create Invalid Status Enum (400)
   try {
     const body = {
-      registrationNumber: `TX-BAD-${Math.floor(Math.random() * 10000)}`,
+      registrationNumber: `MH-12-BD-${1000 + Math.floor(Math.random() * 9000)}`,
       model: 'Ram ProMaster',
       type: 'Van',
       maxLoadCapacity: 1200,
@@ -264,7 +264,7 @@ async function run() {
   // ==========================================
   console.log('\n--- Running Driver Tests ---');
   let testDriverId = null;
-  const testLicenseNo = `DL-TEST-${Math.floor(Math.random() * 1000000)}`;
+  const testLicenseNo = `DL14 ${20000000000 + Math.floor(Math.random() * 9000000000)}`;
 
   // Test 1: GET (list)
   try {
@@ -301,7 +301,7 @@ async function run() {
       licenseNumber: testLicenseNo,
       category: 'Class A',
       licenseExpiryDate: '2030-01-01',
-      contact: '+1-555-9999',
+      contact: `+91-${9000000000 + Math.floor(Math.random() * 1000000000)}`,
       safetyScore: 98,
       status: 'Available'
     };
@@ -324,10 +324,10 @@ async function run() {
   try {
     const body = {
       name: 'Bad Status Driver',
-      licenseNumber: `DL-BAD-${Math.floor(Math.random() * 1000000)}`,
+      licenseNumber: `DL14 ${10000000000 + Math.floor(Math.random() * 9000000000)}`,
       category: 'Class A',
       licenseExpiryDate: '2030-01-01',
-      contact: '+1-555-9999',
+      contact: `+91-${9000000000 + Math.floor(Math.random() * 1000000000)}`,
       safetyScore: 98,
       status: 'SUSPENDED_JUNK' // Invalid status
     };
