@@ -11,7 +11,13 @@ const { checkPermission } = rbac;
 export const requirePermission = (action) => {
   return (req, res, next) => {
     // Dev 2's auth guard attaches decoded user payload with role to req.user
-    const role = req.user?.role;
+    const roleMap = {
+      'ADMIN': 'Admin',
+      'DISPATCHER': 'Dispatcher',
+      'DRIVER': 'Driver',
+      'MAINTENANCE_STAFF': 'Maintenance Staff'
+    };
+    const role = roleMap[req.user?.role] || req.user?.role;
 
     if (!role) {
       return res.status(403).json({ 

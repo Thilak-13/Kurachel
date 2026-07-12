@@ -1,21 +1,20 @@
 import express from 'express';
+import { verifyToken } from '../middlewares/auth.middleware.js';
+import { requirePermission } from '../middlewares/rbac.middleware.js';
+import * as controller from '../controllers/driver.controller.js';
+
 const router = express.Router();
 
-// Placeholder for Driver CRUD operations
-router.get('/', (req, res) => {
-  res.json({ message: 'GET /api/drivers - Retrieve all drivers (placeholder)' });
-});
+// GET /api/drivers
+router.get('/', verifyToken, requirePermission('driver:view'), controller.getDrivers);
 
-router.post('/', (req, res) => {
-  res.json({ message: 'POST /api/drivers - Create new driver (placeholder)' });
-});
+// POST /api/drivers
+router.post('/', verifyToken, requirePermission('driver:create'), controller.createDriver);
 
-router.put('/:id', (req, res) => {
-  res.json({ message: `PUT /api/drivers/${req.params.id} - Update driver (placeholder)` });
-});
+// PUT /api/drivers/:id
+router.put('/:id', verifyToken, requirePermission('driver:update'), controller.updateDriver);
 
-router.delete('/:id', (req, res) => {
-  res.json({ message: `DELETE /api/drivers/${req.params.id} - Delete driver (placeholder)` });
-});
+// DELETE /api/drivers/:id
+router.delete('/:id', verifyToken, requirePermission('driver:delete'), controller.deleteDriver);
 
 export default router;

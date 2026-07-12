@@ -1,21 +1,20 @@
 import express from 'express';
+import { verifyToken } from '../middlewares/auth.middleware.js';
+import { requirePermission } from '../middlewares/rbac.middleware.js';
+import * as controller from '../controllers/vehicle.controller.js';
+
 const router = express.Router();
 
-// Placeholder for Vehicle CRUD operations
-router.get('/', (req, res) => {
-  res.json({ message: 'GET /api/vehicles - Retrieve all vehicles (placeholder)' });
-});
+// GET /api/vehicles
+router.get('/', verifyToken, requirePermission('vehicle:view'), controller.getVehicles);
 
-router.post('/', (req, res) => {
-  res.json({ message: 'POST /api/vehicles - Create new vehicle (placeholder)' });
-});
+// POST /api/vehicles
+router.post('/', verifyToken, requirePermission('vehicle:create'), controller.createVehicle);
 
-router.put('/:id', (req, res) => {
-  res.json({ message: `PUT /api/vehicles/${req.params.id} - Update vehicle (placeholder)` });
-});
+// PUT /api/vehicles/:id
+router.put('/:id', verifyToken, requirePermission('vehicle:update'), controller.updateVehicle);
 
-router.delete('/:id', (req, res) => {
-  res.json({ message: `DELETE /api/vehicles/${req.params.id} - Delete vehicle (placeholder)` });
-});
+// DELETE /api/vehicles/:id
+router.delete('/:id', verifyToken, requirePermission('vehicle:delete'), controller.deleteVehicle);
 
 export default router;
