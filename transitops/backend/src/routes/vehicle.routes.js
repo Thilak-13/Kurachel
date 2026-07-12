@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 // Placeholder for Vehicle CRUD operations
@@ -18,4 +18,4 @@ router.delete('/:id', (req, res) => {
   res.json({ message: `DELETE /api/vehicles/${req.params.id} - Delete vehicle (placeholder)` });
 });
 
-module.exports = router;
+export default router;

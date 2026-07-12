@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 // Placeholder for Driver CRUD operations
@@ -18,4 +18,4 @@ router.delete('/:id', (req, res) => {
   res.json({ message: `DELETE /api/drivers/${req.params.id} - Delete driver (placeholder)` });
 });
 
-module.exports = router;
+export default router;

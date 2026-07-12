@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 // Placeholder for Trip CRUD and Dispatch operations
@@ -18,4 +18,4 @@ router.delete('/:id', (req, res) => {
   res.json({ message: `DELETE /api/trips/${req.params.id} - Cancel/Delete trip (placeholder)` });
 });
 
-module.exports = router;
+export default router;

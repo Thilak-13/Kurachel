@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 // Placeholder for Maintenance operations
@@ -14,4 +14,4 @@ router.put('/:id', (req, res) => {
   res.json({ message: `PUT /api/maintenance/${req.params.id} - Update maintenance status (placeholder)` });
 });
 
-module.exports = router;
+export default router;

@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 // Placeholder for Reports & Dashboard aggregations
@@ -10,4 +10,4 @@ router.get('/summary', (req, res) => {
   res.json({ message: 'GET /api/reports/summary - Retrieve detailed operational report (placeholder)' });
 });
 
-module.exports = router;
+export default router;
