@@ -1,0 +1,5 @@
+[
+  { "id": "t1", "routeName": "Route 42 - Downtown Express", "vehicleId": "v1", "vehiclePlate": "TX-1234", "driverId": "d2", "driverName": "John Smith", "status": "IN_PROGRESS", "startTime": "08:00 AM", "destination": "Downtown Hub" },
+  { "id": "t2", "routeName": "Route 10 - Airport Shuttle", "vehicleId": "v3", "vehiclePlate": "TX-8888", "driverId": "d1", "driverName": "Jane Doe", "status": "SCHEDULED", "startTime": "11:30 AM", "destination": "Terminal 2" },
+  { "id": "t3", "routeName": "Route 5 - Northside Delivery", "vehicleId": "v5", "vehiclePlate": "TX-4321", "driverId": "d3", "driverName": "Alice Johnson", "status": "COMPLETED", "startTime": "06:00 AM", "destination": "North Logistics Park" }
+]

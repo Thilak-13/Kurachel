@@ -1,0 +1,14 @@
+{
+  "fleetUptime": 94.2,
+  "completedTripsCount": 1120,
+  "fuelExpenses": 3450,
+  "maintenanceDowntimeHours": 18,
+  "monthlyStats": [
+    { "month": "Jan", "trips": 950, "uptime": 93.5 },
+    { "month": "Feb", "trips": 980, "uptime": 94.0 },
+    { "month": "Mar", "trips": 1050, "uptime": 93.8 },
+    { "month": "Apr", "trips": 1100, "uptime": 94.5 },
+    { "month": "May", "trips": 1150, "uptime": 94.1 },
+    { "month": "Jun", "trips": 1120, "uptime": 94.2 }
+  ]
+}

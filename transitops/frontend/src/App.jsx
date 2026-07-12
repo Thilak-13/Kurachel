@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import MainLayout from './components/MainLayout';
 import Dashboard from './pages/Dashboard';
 import Vehicles from './pages/Vehicles';
 import Drivers from './pages/Drivers';
@@ -7,60 +9,139 @@ import Maintenance from './pages/Maintenance';
 import Reports from './pages/Reports';
 import Login from './pages/Login';
 
-function App() {
-  const [currentPage, setCurrentPage] = useState('Dashboard');
-  const [user, setUser] = useState({ username: 'Guest', role: 'ADMIN' });
+function ProtectedRoute({ isAuthenticated, user, allowedRoles, children }) {
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  if (allowedRoles && !allowedRoles.includes(user?.role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return children;
+}
 
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'Dashboard':
-        return <Dashboard user={user} />;
-      case 'Vehicles':
-        return <Vehicles user={user} />;
-      case 'Drivers':
-        return <Drivers user={user} />;
-      case 'Trips':
-        return <Trips user={user} />;
-      case 'Maintenance':
-        return <Maintenance user={user} />;
-      case 'Reports':
-        return <Reports user={user} />;
-      case 'Login':
-        return <Login user={user} setUser={setUser} />;
-      default:
-        return <Dashboard user={user} />;
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('transitops_auth') === 'true';
+  });
+  
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('transitops_user');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return { username: 'admin_user', role: 'Admin', email: 'admin@transitops.com' };
+      }
     }
-  };
+    return { username: 'admin_user', role: 'Admin', email: 'admin@transitops.com' };
+  });
+
+  useEffect(() => {
+    localStorage.setItem('transitops_auth', isAuthenticated);
+    if (user) {
+      localStorage.setItem('transitops_user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('transitops_user');
+    }
+  }, [isAuthenticated, user]);
 
   return (
-    <div className="app-container" style={{ fontFamily: 'sans-serif', padding: '20px' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
-        <h1>TransitOps Portal</h1>
-        <nav style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-          {['Dashboard', 'Vehicles', 'Drivers', 'Trips', 'Maintenance', 'Reports', 'Login'].map((page) => (
-            <button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              style={{
-                fontWeight: currentPage === page ? 'bold' : 'normal',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '16px'
-              }}
+    <BrowserRouter>
+      <Routes>
+        {/* Public Route */}
+        <Route 
+          path="/login" 
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Login setUser={setUser} setIsAuthenticated={setIsAuthenticated} />
+            )
+          } 
+        />
+
+        {/* Protected Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated} user={user}>
+              <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
+                <Dashboard user={user} />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/vehicles"
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated} user={user}>
+              <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
+                <Vehicles user={user} />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/drivers"
+          element={
+            <ProtectedRoute 
+              isAuthenticated={isAuthenticated} 
+              user={user} 
+              allowedRoles={['Admin', 'Fleet Manager', 'Dispatcher']}
             >
-              {page}
-            </button>
-          ))}
-          <span style={{ marginLeft: '20px', padding: '5px 10px', backgroundColor: '#f0f0f0', borderRadius: '4px' }}>
-            {user.username} ({user.role})
-          </span>
-        </nav>
-      </header>
-      <main style={{ marginTop: '20px' }}>
-        {renderPage()}
-      </main>
-    </div>
+              <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
+                <Drivers user={user} />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trips"
+          element={
+            <ProtectedRoute 
+              isAuthenticated={isAuthenticated} 
+              user={user} 
+              allowedRoles={['Admin', 'Dispatcher']}
+            >
+              <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
+                <Trips user={user} />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/maintenance"
+          element={
+            <ProtectedRoute 
+              isAuthenticated={isAuthenticated} 
+              user={user} 
+              allowedRoles={['Admin', 'Dispatcher', 'Maintenance Manager']}
+            >
+              <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
+                <Maintenance user={user} />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute 
+              isAuthenticated={isAuthenticated} 
+              user={user} 
+              allowedRoles={['Admin', 'Fleet Manager', 'Maintenance Manager']}
+            >
+              <MainLayout user={user} setUser={setUser} setIsAuthenticated={setIsAuthenticated}>
+                <Reports user={user} />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch-all Route redirects to Login or Dashboard */}
+        <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

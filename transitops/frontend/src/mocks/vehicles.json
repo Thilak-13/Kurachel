@@ -1,0 +1,7 @@
+[
+  { "id": "v1", "licensePlate": "TX-1234", "make": "Ford", "model": "Transit", "status": "ACTIVE", "odometer": 45000, "fuelLevel": 85, "type": "Van" },
+  { "id": "v2", "licensePlate": "TX-9012", "make": "Nissan", "model": "NV200", "status": "IN_MAINTENANCE", "odometer": 22500, "fuelLevel": 40, "type": "Van" },
+  { "id": "v3", "licensePlate": "TX-8888", "make": "Chevrolet", "model": "Express", "status": "ACTIVE", "odometer": 78900, "fuelLevel": 92, "type": "Van" },
+  { "id": "v4", "licensePlate": "TX-5555", "make": "Freightliner", "model": "M2", "status": "OUT_OF_SERVICE", "odometer": 125000, "fuelLevel": 10, "type": "Box Truck" },
+  { "id": "v5", "licensePlate": "TX-4321", "make": "Ford", "model": "F-550", "status": "ACTIVE", "odometer": 31200, "fuelLevel": 65, "type": "Flatbed" }
+]

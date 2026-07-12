@@ -1,0 +1,6 @@
+[
+  { "id": "d1", "name": "Jane Doe", "licenseNumber": "DL-987654", "status": "ACTIVE", "phone": "555-0199", "email": "jane.doe@transitops.com" },
+  { "id": "d2", "name": "John Smith", "licenseNumber": "DL-123456", "status": "ON_TRIP", "phone": "555-0144", "email": "john.smith@transitops.com" },
+  { "id": "d3", "name": "Alice Johnson", "licenseNumber": "DL-456789", "status": "ON_BREAK", "phone": "555-0188", "email": "alice.j@transitops.com" },
+  { "id": "d4", "name": "Bob Williams", "licenseNumber": "DL-789012", "status": "INACTIVE", "phone": "555-0122", "email": "bob.w@transitops.com" }
+]
