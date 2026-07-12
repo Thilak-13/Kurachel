@@ -1,25 +1,36 @@
-// Dispatch validation rules - Stub Signatures for Block 1
+// Dispatch validation rules
 const { VehicleStatus, DriverStatus } = require('../enums');
 
 /**
- * Checks if a vehicle's registration number is unique.
+ * Checks if a vehicle's registration number is unique in the database.
  * @param {string} regNo 
+ * @param {Object} dbClient - The database client instance (e.g., PrismaClient)
  * @returns {Promise<boolean>}
  */
-async function isRegNumberUnique(regNo) {
-  // Stub body - to be implemented in Block 2/3
-  return true;
+async function isRegNumberUnique(regNo, dbClient) {
+  if (!dbClient) {
+    throw new Error('Database client parameter is required for unique check.');
+  }
+  const existingVehicle = await dbClient.vehicle.findUnique({
+    where: { registrationNumber: regNo }
+  });
+  return !existingVehicle;
 }
 
 /**
  * Validates whether a value is a valid enum status for a given entity type.
- * @param {'vehicle' | 'driver' | 'trip'} entity 
+ * @param {'vehicle' | 'driver'} entity 
  * @param {string} value 
  * @returns {boolean}
  */
 function isValidStatusEnum(entity, value) {
-  // Stub body - to be implemented in Block 2/3
-  return true;
+  if (entity === 'vehicle') {
+    return Object.values(VehicleStatus).includes(value);
+  }
+  if (entity === 'driver') {
+    return Object.values(DriverStatus).includes(value);
+  }
+  return false;
 }
 
 /**
@@ -28,7 +39,7 @@ function isValidStatusEnum(entity, value) {
  * @returns {boolean}
  */
 function isVehicleAvailableForDispatch(vehicle) {
-  // Stub body - to be implemented in Block 2/3
+  // Stub body - to be implemented in Block 3
   return true;
 }
 
@@ -38,7 +49,7 @@ function isVehicleAvailableForDispatch(vehicle) {
  * @returns {boolean}
  */
 function isDriverAvailableForDispatch(driver) {
-  // Stub body - to be implemented in Block 2/3
+  // Stub body - to be implemented in Block 3
   return true;
 }
 
@@ -48,7 +59,7 @@ function isDriverAvailableForDispatch(driver) {
  * @returns {boolean}
  */
 function isLicenseValid(driver) {
-  // Stub body - to be implemented in Block 2/3
+  // Stub body - to be implemented in Block 3
   return true;
 }
 
@@ -59,7 +70,7 @@ function isLicenseValid(driver) {
  * @returns {boolean}
  */
 function isCargoWithinCapacity(cargoWeight, vehicle) {
-  // Stub body - to be implemented in Block 2/3
+  // Stub body - to be implemented in Block 3
   return true;
 }
 
